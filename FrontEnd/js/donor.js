@@ -1,8 +1,9 @@
-var submitEl = document.getElementById("submit-btn")
-var submit = document.getElementById("submit")
-var img = document.getElementById("img")
+const submitEl = document.getElementById("submit-btn")
+const submit = document.getElementById("submit")
+const img = document.getElementById("img")
 submitEl.addEventListener("mouseover", function(){
     submitEl.style.backgroundColor="black"
+    submitEl.style.cursor="pointer"
     submit.style.color="white"
     img.innerHTML=`<img src="images/check-circle-dark.png">`
 
