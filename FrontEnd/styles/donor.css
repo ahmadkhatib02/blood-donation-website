@@ -1,0 +1,187 @@
+body{
+    margin: 0px;
+    font-family: "Roboto",sans-serif; 
+}
+
+/*Typogrophy*/
+h1{
+    display: inline-block;
+    background:linear-gradient(90.1deg, #46052D -1.59%, #46052D -1.58%, #500732 14.15%, #5E0933 31.58%, #610834 46.9%, #6A0B37 62.75%, #991747 76.48%, #B32346 93.91%);
+    font-size: 36px;
+    font-weight: 500;
+    line-height: 42.19px;
+    text-align: left;
+    color: white;
+    width: 87%;
+    margin: 0 57px;
+    padding: 60px 37px;
+}
+
+label, input::placeholder,p{
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 28.13px;
+    text-align: left;
+    color: #646464;
+}
+
+input::placeholder{
+    color: #c6c6c6;
+}
+
+/* nav bar */
+.logo{ 
+    width: 61px;
+    height: 62px;
+    top: 53px;
+    left: 62px;
+    margin-top: -100px;
+}
+
+.navdiv{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 700px;
+    height: 71px;
+    top: 52px;
+    left: 62px;
+    padding-top: 52px;
+    margin: 0px 62px 90px 12px;
+   
+}
+ul{
+    list-style-type: none;
+    display: flex;
+    gap: 74px;
+    min-width: 743px;
+    min-height: 36px;
+    
+}
+
+.header{
+    color: black;
+    text-decoration: none;
+    margin-top: 0px;
+    font-family: "Poppins",sans-serif;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 36px;
+}
+
+
+.clicked, .header:hover{
+    border-bottom: 2px solid black;
+    box-shadow: 0px 4px 4px 0px whitesmoke;
+}
+
+.login-button{
+    border-radius: 10px;
+    border: 2px solid black;
+    padding: 18px 36px;
+    text-decoration: none;
+    color: black;
+    margin: 0px;
+    font-family: "Robotto",sans-serif;
+    font-size: 25px;
+    font-weight: 400;
+    line-height: 29.3px;
+}
+
+.login-button:hover{
+    color: whitesmoke;
+    background-color:  #991747;
+    border: none;
+}
+
+/* Form */
+form{
+    width: 87%;
+    top: 377px;
+    left: 30px;
+    gap: 0px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 90px 2px #A5A4A440;
+    display: block;
+    margin: 0px auto;
+    padding: 77px 64px;
+}
+
+form div{
+    margin-bottom: 20px;
+}
+
+form input, input::placeholder{
+    padding: 15px 31px;
+}
+
+form input, form select{
+    border-radius: 10px;
+    border: 1px solid #dadada;
+    margin-left: 66px;
+    width: 1025px;
+    height: 58px;
+    top: 558px;
+    left: 322px;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 28.13px;
+    text-align: left;
+    color: black;
+}
+
+#firstName{
+    width: 460px;
+    top: 439px;
+    left: 322px;    
+}
+
+#lastName{
+    width: 468px;
+    height: 58px;
+    top: 439px;
+    left: 879px;
+}
+
+#phoneNb{
+    margin-left: 10px;
+}
+
+input[type= "radio"]{ 
+    width: 1rem; 
+    height: 1rem; 
+    border: 2px solid #ccc; 
+    border-radius: 50%; 
+    background-color: white; 
+    cursor: pointer;
+    outline: none;
+}
+
+input:focus{
+    border: 2px solid #46052D;
+    box-shadow: 0px 4px 90px 2px #46052D;
+}
+
+p{
+    margin-bottom: 10px;
+}
+
+button{
+    height: 72px;
+    padding: 22px 55px;
+    display: flex;
+    margin-left: auto;
+    gap: 20px;
+    align-items: center;
+    background-color: white;
+    box-shadow: 0px 4px 90px 2px #A5A4A440;
+
+}
+
+span{
+    font-family: "Robotto",sans-serif;  
+    font-size: 25px;
+    font-weight: 400;
+    line-height: 29.3px;
+    text-align: left;
+}
