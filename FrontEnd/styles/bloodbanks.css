@@ -1,0 +1,169 @@
+body{
+    margin: 0px;
+    font-family: "Roboto", sans-serif;
+}
+
+/*Typogrophy */
+h1{
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 42.19px;
+    width: 482px;
+    height: 55px;
+    top: 355px;
+    left: 136px;
+    margin-bottom: 0px;
+}
+
+#selection1, #selection2{
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 30px;
+    letter-spacing: 0.0168em;
+    text-align: left;
+}
+
+p{
+    font-family: "Manrope", serif;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 32.78px;
+    top: 418px;
+    left: 136px;
+}
+
+/* nav bar */
+.logo{ 
+    width: 61px;
+    height: 62px;
+    top: 53px;
+    left: 62px;
+    margin-top: -100px;
+}
+
+.navdiv{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 700px;
+    height: 71px;
+    top: 52px;
+    left: 62px;
+    padding-top: 52px;
+    margin: 0px 62px 90px 12px;
+   
+}
+ul{
+    list-style-type: none;
+    display: flex;
+    gap: 74px;
+    min-width: 743px;
+    min-height: 36px;
+    
+}
+
+.header{
+    color: black;
+    text-decoration: none;
+    margin-top: 0px;
+    font-family: "Poppins",sans-serif;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 36px;
+}
+
+
+.clicked, .header:hover{
+    border-bottom: 2px solid black;
+    box-shadow: 0px 4px 4px 0px whitesmoke;
+}
+
+.login-button{
+    border-radius: 10px;
+    border: 2px solid black;
+    padding: 18px 36px;
+    text-decoration: none;
+    color: black;
+    margin: 0px;
+    font-family: "Robotto",sans-serif;
+    font-size: 25px;
+    font-weight: 400;
+    line-height: 29.3px;
+}
+
+.login-button:hover{
+    color: whitesmoke;
+    background-color:  #991747;
+    border: none;
+}
+
+/*main*/
+.bloodbank{
+    display: block;
+    margin: 64px 83px 0 83px;
+    border: 1px solid black;
+    border-radius: 10px;
+    box-shadow: 0px 4px 90px 2px #D1CDCD40;
+    padding: 16px 50px;
+}
+
+.bank-header{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+#Contact{
+    margin-top: 30px;
+    width: 175px;
+    height: 45px;
+    top: 355px;
+    left: 1132px;
+    border-radius: 10px;
+    background-color: black;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+#Contact:hover{
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+}
+
+p{
+    margin-top: 0px;
+}
+
+.center{
+    display: flex;
+    justify-content: center;
+    
+}
+
+.buttons{
+    display: inline-block;
+    text-align: center;
+    border-radius: 30px;
+    background: #EAEAEA33;
+    box-shadow: 0px 2px 4px 0px #61616133 inset;
+    box-shadow: 0px 1px 2px 0px #61616133 inset;
+    padding: 10px 0px 10px 26px;
+}
+
+#selection1{
+    margin-right: 23px;
+    cursor: pointer;
+}
+
+#selection2{
+    background-color: black;
+    border-radius: 30px;
+    color: white;
+    padding: 13px 23px;
+    cursor: pointer;
+}
