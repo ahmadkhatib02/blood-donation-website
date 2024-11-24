@@ -25,7 +25,7 @@
         <img src="images/panel.png">
         <div class="recipient-form">
             <h1>Recipient Details</h1>
-            <form>
+            <form action="bloodbanks.html">
                 <div>
                     <label for="firstName">Full Name</label>
                     <input type="text" id="firstName" placeholder="First" required><br>
@@ -34,7 +34,7 @@
 
                 <div>
                     <label> Blood Group</label>
-                    <select id="bloodGroup" class="blood-group">
+                    <select id="bloodGroup" class="blood-group" required>
                         <option selected></option>
                         <option value="A+">A+</option>
                         <option value="A-">A-</option>
@@ -54,7 +54,7 @@
 
                 <div>
                     <label for="cities">City:</label>
-                    <select id="cities" name="cities">
+                    <select id="cities" name="cities" required>
                         <option value="" disabled selected>Select a city</option>
                         <option value="Antelias">Antelias</option>
                         <option value="Baalbek">Baalbek</option>
