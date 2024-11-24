@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Blood</title>
+    <link rel="icon" href="images/footerLogo.png">
+    <link rel="stylesheet" href="styles/findblood.css">
+
+</head>
+<body>
+    <nav>
+        <div class="navdiv">
+            <div class="logo"> <a href="homePage.html"><img src="images/logo.png"></a></li></div>
+            <ul>
+                <li> <a href="homePage.html" class="header">Home</a></li>
+                <li><a href="#" class="header clicked">Find Blood</a></li>
+                <li><a href="donor.html" class="header">Register Now</a></li>
+                <li><a href="#" class="login-button">Log In</a></li>
+            </ul>
+        </div>
+    </nav>
+    <main>
+
+        <img src="images/panel.png">
+        <div class="recipient-form">
+            <h1>Recipient Details</h1>
+            <form>
+                <div>
+                    <label for="firstName">Full Name</label>
+                    <input type="text" id="firstName" placeholder="First" required><br>
+                    <input type="text" id="lastName"  placeholder="Last Name" required>
+                </div>
+
+                <div>
+                    <label> Blood Group</label>
+                    <select id="bloodGroup" class="blood-group">
+                        <option selected></option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="john@example.com" required>
+                </div>
+
+                <div>
+                    <label for="cities">City:</label>
+                    <select id="cities" name="cities">
+                        <option value="" disabled selected>Select a city</option>
+                        <option value="Antelias">Antelias</option>
+                        <option value="Baalbek">Baalbek</option>
+                        <option value="Beirut">Beirut</option>
+                        <option value="Beit Eddine">Beit Eddine</option>
+                        <option value="Halba">Halba</option>
+                        <option value="Haret Hreik">Haret Hreik</option>
+                        <option value="Hazmieh">Hazmieh</option>
+                        <option value="Jbeil">Jbeil</option>
+                        <option value="Jounieh">Jounieh</option>
+                        <option value="Nabatieh">Nabatieh</option>
+                        <option value="Rachaya">Rachaya</option>
+                        <option value="Saida">Saida</option>
+                        <option value="Tripoli">Tripoli</option>
+                        <option value="Tyre">Tyre</option>
+                        <option value="Zahle">Zahle</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="submit-el">
+                    <span>Proceed</span>
+                    <span>></span>
+                    </button>
+            </form>    
+        </div>
+    </main>
+    <script src="js/findblood.js"></script>
+</body>
+
+</html>

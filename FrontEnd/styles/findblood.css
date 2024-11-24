@@ -5,19 +5,22 @@ body{
 
 /*Typogrophy*/
 h1{
-    display: inline-block;
-    background:linear-gradient(90.1deg, #46052D -1.59%, #46052D -1.58%, #500732 14.15%, #5E0933 31.58%, #610834 46.9%, #6A0B37 62.75%, #991747 76.48%, #B32346 93.91%);
-    font-size: 36px;
-    font-weight: 500;
-    line-height: 42.19px;
-    text-align: left;
-    color: white;
-    width: 87%;
-    margin: 0 57px;
-    padding: 60px 37px;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 35.16px;
+    text-align: right;
 }
 
-label, input::placeholder,p{
+form label{
+    font-size: 24px;
+    font-weight: 400;
+
+    line-height: 28.13px;
+    text-align: left;
+    color: #646464;
+}
+
+label, input::placeholder,p, form input, form select{
     font-size: 24px;
     font-weight: 400;
     line-height: 28.13px;
@@ -29,7 +32,7 @@ input::placeholder{
     color: #c6c6c6;
 }
 
-/* nav bar */
+/*nav bar*/
 .logo{ 
     width: 61px;
     height: 62px;
@@ -94,87 +97,39 @@ ul{
     border: none;
 }
 
-/* Form */
-form{
+/*main*/
+main{
+    display: flex;
+    justify-content: space-between;
     width: 87%;
-    top: 377px;
-    left: 30px;
-    gap: 0px;
+    top: 213px;
+    left: 86px;
     border-radius: 10px;
     box-shadow: 0px 4px 90px 2px #A5A4A440;
-    display: block;
     margin: 0px auto;
-    padding: 77px 64px;
+}
+
+/*form*/
+.recipient-form{
+    margin: 110px 120px 47px 0px;
 }
 
 form div{
-    margin-bottom: 20px;
-}
-
-form input, input::placeholder{
-    padding: 15px 31px;
+    margin-bottom: 47px;
 }
 
 form input, form select{
-    border-radius: 10px;
-    border: 1px solid #dadada;
-    margin-left: 66px;
-    width: 1025px;
-    height: 58px;
-    top: 558px;
-    left: 322px;
-    font-size: 24px;
-    font-weight: 400;
-    line-height: 28.13px;
-    text-align: left;
-    color: black;
-}
-
-#firstName{
-    width: 460px;
-    top: 439px;
-    left: 322px;    
-}
-
-#lastName{
-    width: 468px;
-    height: 58px;
-    top: 439px;
-    left: 879px;
-}
-
-#phoneNb{
-    margin-left: 10px;
-}
-
- form select{
+    margin-left: 60px;
     width: 335px;
     height: 58px;
     top: 426px;
     left: 946px;
     border-radius: 10px;
     border: 1px solid #dadada;
-    background-color: white;
-
 }
 
-input[type= "radio"]{ 
-    width: 1rem; 
-    height: 1rem; 
-    border: 2px solid #ccc; 
-    border-radius: 50%; 
-    background-color: white; 
-    cursor: pointer;
-    outline: none;
-}
-
-input:focus{
-    border: 2px solid #46052D;
-    box-shadow: 0px 4px 90px 2px #46052D;
-}
-
-p{
-    margin-bottom: 10px;
+form select{
+    color: black;
 }
 
 button{
@@ -185,8 +140,8 @@ button{
     gap: 20px;
     align-items: center;
     background-color: white;
+    border-radius: 10px;
     box-shadow: 0px 4px 90px 2px #A5A4A440;
-
 }
 
 span{
@@ -195,4 +150,22 @@ span{
     font-weight: 400;
     line-height: 29.3px;
     text-align: left;
+}
+
+#lastName{
+    margin-top: 10px;
+    margin-left: 175px;
+}
+
+input:focus{
+    border: 2px solid #46052D;
+    box-shadow: 0px 4px 90px 2px #46052D;
+}
+
+.blood-group{
+    margin-top: 10px;
+}
+
+form select{
+    background-color: white;
 }
