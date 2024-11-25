@@ -101,7 +101,6 @@ ul{
 .bloodbank{
     display: block;
     margin: 64px 83px 0 83px;
-    border: 1px solid black;
     border-radius: 10px;
     box-shadow: 0px 4px 90px 2px #D1CDCD40;
     padding: 16px 50px;
@@ -113,7 +112,7 @@ ul{
     margin-bottom: 8px;
 }
 
-#Contact{
+.Contact{
     margin-top: 30px;
     width: 175px;
     height: 45px;
@@ -129,7 +128,7 @@ ul{
     cursor: pointer;
 }
 
-#Contact:hover{
+.Contact:hover{
     background-color: white;
     color: black;
     border: 1px solid black;
