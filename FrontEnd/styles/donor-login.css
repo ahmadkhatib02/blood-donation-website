@@ -29,7 +29,7 @@ input::placeholder{
     color: #c6c6c6;
 }
 
-/* nav bar */
+/*nav bar*/
 .logo{ 
     width: 61px;
     height: 62px;
@@ -115,7 +115,7 @@ form input, input::placeholder{
     padding: 15px 31px;
 }
 
-form input, form select{
+form input{
     border-radius: 10px;
     border: 1px solid #dadada;
     margin-left: 66px;
@@ -130,51 +130,13 @@ form input, form select{
     color: black;
 }
 
-#firstName{
-    width: 460px;
-    top: 439px;
-    left: 322px;    
-}
-
-#lastName{
-    width: 468px;
-    height: 58px;
-    top: 439px;
-    left: 879px;
-}
-
-#phoneNb{
-    margin-left: 10px;
-}
-
- form select{
-    width: 335px;
-    height: 58px;
-    top: 426px;
-    left: 946px;
-    border-radius: 10px;
-    border: 1px solid #dadada;
-    background-color: white;
-
-}
-
-input[type= "radio"]{ 
-    width: 1rem; 
-    height: 1rem; 
-    border: 2px solid #ccc; 
-    border-radius: 50%; 
-    background-color: white; 
-    cursor: pointer;
-    outline: none;
+input[type="password"]{
+    margin-left: 20px;
 }
 
 input:focus{
     border: 2px solid #46052D;
     box-shadow: 0px 4px 90px 2px #46052D;
-}
-
-p{
-    margin-bottom: 10px;
 }
 
 button{
