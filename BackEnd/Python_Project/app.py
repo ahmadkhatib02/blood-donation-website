@@ -3,7 +3,6 @@ from flask_mysqldb import MySQL
 from flask_cors import CORS
 import bcrypt
 from functools import wraps
-
 app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin Resource Sharing (optional for frontend-backend separation)
 
@@ -132,6 +131,36 @@ def donors():
     donors = cur.fetchall()
     return jsonify({'donors': donors}), 200
 
+
+    # Route for listing hospitals and Red Cross locations
+@app.route('/locations', methods=['GET'])
+def locations():
+    location_type = request.args.get('type')  # Get the type (H for hospitals, R for Red Cross) from the query parameter
+
+    if not location_type or location_type not in ['H', 'R']:
+        return jsonify({'message': 'Invalid or missing location type'}), 400
+
+    cur = mysql.connection.cursor()
+    try:
+        # Query the database for locations based on type
+        cur.execute("SELECT * FROM location WHERE type = %s", (location_type,))
+        locations = cur.fetchall()
+
+        # Convert the result into a readable format
+        result = [
+            {
+                'id': loc[0],
+                'name': loc[1],
+                'address': loc[2],
+                'phone': loc[3],
+                'type': loc[4]  # H for hospitals, R for Red Cross
+            }
+            for loc in locations
+        ]
+
+        return jsonify({'locations': result}), 200
+    except Exception as e:
+        return jsonify({'message': f'Error: {str(e)}'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
-
