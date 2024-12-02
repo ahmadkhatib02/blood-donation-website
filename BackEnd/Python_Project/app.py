@@ -131,6 +131,82 @@ def donors():
     donors = cur.fetchall()
     return jsonify({'donors': donors}), 200
 
+# store the order of blood and recipient
+def store_order(cursor, blood_id, recipient_id, branch_id):
+    try:
+        query = """
+        INSERT INTO orders (blood_ID, recipient_ID, branch_ID)
+        VALUES (%s, %s, %s)
+        """
+        cursor.execute(query, (blood_id, recipient_id, branch_id))
+        print("Order stored successfully.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+
+# get the donor info - blood type and such
+def get_donor_info(cursor, donor_id):
+    try:
+        query = """
+        SELECT d.donor_ID, i.firstName, i.lastName, i.email, d.blood_type, d.rhesus
+        FROM donor d
+        JOIN individual i ON d.donor_ID = i.individual_ID
+        WHERE d.donor_ID = %s
+        """
+        cursor.execute(query, (donor_id,))
+        return cursor.fetchone()
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+
+# get recipient info such as blood type
+def get_recipient_info(cursor, recipient_id):
+    try:
+        query = """
+        SELECT recipient_ID, firstName, lastName, email, blood_type, city
+        FROM recipient
+        WHERE recipient_ID = %s
+        """
+        cursor.execute(query, (recipient_id,))
+        return cursor.fetchone()
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+
+# get organization info
+def get_organization_info(cursor, branch_id):
+    try:
+        query = """
+        SELECT branch_ID, name, phoneNumber, city, street
+        FROM branch
+        WHERE branch_ID = %s
+        """
+        cursor.execute(query, (branch_id,))
+        return cursor.fetchone()
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+
+# create admin user and password
+def create_admin_user(cursor, branch_id, email, password):
+    try:
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        query = """
+        INSERT INTO individual (email, password)
+        VALUES (%s, %s)
+        """
+        cursor.execute(query, (email, hashed_password))
+        
+        # Retrieve the admin's individual ID
+        cursor.execute("SELECT LAST_INSERT_ID()")
+        admin_id = cursor.fetchone()[0]
+
+        # Link to branch (if needed)
+        link_query = """
+        INSERT INTO branch_admin (admin_ID, branch_ID)
+        VALUES (%s, %s)
+        """
+        cursor.execute(link_query, (admin_id, branch_id))
+        print("Admin user created successfully.")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+
 
     # Route for listing hospitals and Red Cross locations
 @app.route('/locations', methods=['GET'])
