@@ -211,32 +211,41 @@ def create_admin_user(cursor, branch_id, email, password):
     # Route for listing hospitals and Red Cross locations
 @app.route('/locations', methods=['GET'])
 def locations():
-    location_type = request.args.get('type')  # Get the type (H for hospitals, R for Red Cross) from the query parameter
+    location_type = request.args.get('type')  # 'H' for hospitals, 'R' for Red Cross branches
 
+    # Validate input type
     if not location_type or location_type not in ['H', 'R']:
         return jsonify({'message': 'Invalid or missing location type'}), 400
 
     cur = mysql.connection.cursor()
     try:
-        # Query the database for locations based on type
-        cur.execute("SELECT * FROM location WHERE type = %s", (location_type,))
-        locations = cur.fetchall()
+        # Determine query based on type
+        if location_type == 'H':  # Hospitals
+            query = "SELECT branch_ID, name, city, street, phoneNumber FROM branch WHERE name NOT LIKE 'Lebanese Red Cross%'"
+        elif location_type == 'R':  # Red Cross branches
+            query = "SELECT branch_ID, name, city, street, phoneNumber FROM branch WHERE name LIKE 'Lebanese Red Cross%'"
 
-        # Convert the result into a readable format
+        # Execute query
+        cur.execute(query)
+        branches = cur.fetchall()
+
+        # Format results
         result = [
             {
-                'id': loc[0],
-                'name': loc[1],
-                'address': loc[2],
-                'phone': loc[3],
-                'type': loc[4]  # H for hospitals, R for Red Cross
+                'id': branch[0],
+                'name': branch[1],
+                'city': branch[2],
+                'street': branch[3],
+                'phone': branch[4]
             }
-            for loc in locations
+            for branch in branches
         ]
 
         return jsonify({'locations': result}), 200
     except Exception as e:
         return jsonify({'message': f'Error: {str(e)}'}), 500
+    finally:
+        cur.close()
 
 if __name__ == '__main__':
     app.run(debug=True)
