@@ -9,7 +9,7 @@ CORS(app)  # Enable Cross-Origin Resource Sharing (optional for frontend-backend
 # Configuring MySQL database
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'  # Change to your MySQL username
-app.config['MYSQL_PASSWORD'] = 'MYSQLmabelle05!'  # Change to your MySQL password
+app.config['MYSQL_PASSWORD'] = 'ahmadkhatib18'  # Change to your MySQL password
 app.config['MYSQL_DB'] = 'blooddonation'
 
 mysql = MySQL(app)

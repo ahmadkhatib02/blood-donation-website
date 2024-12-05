@@ -12,7 +12,7 @@ h1{
     height: 55px;
     top: 355px;
     left: 136px;
-    margin-bottom: 0px;
+    margin-bottom: 20px;
 }
 
 #selection1, #selection2{
@@ -30,6 +30,7 @@ p{
     line-height: 32.78px;
     top: 418px;
     left: 136px;
+    margin-top: 15px;
 }
 
 /* nav bar */
@@ -134,9 +135,7 @@ ul{
     border: 1px solid black;
 }
 
-p{
-    margin-top: 0px;
-}
+
 
 .center{
     display: flex;
