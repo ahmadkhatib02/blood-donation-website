@@ -141,6 +141,8 @@ form input, form select{
     height: 58px;
     top: 439px;
     left: 879px;
+   margin-top: 10px;
+   margin-left: 11pc;
 }
 
 #phoneNb{
