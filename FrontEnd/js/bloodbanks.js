@@ -77,19 +77,6 @@ hospital.addEventListener("click",function(){
     displayElements(allLocations.hospitals)
 })
 
-for(let i=0; i<contact.length; i++){
-    contact[i].addEventListener("click",function(){
-        book(booking,name[i].innerText, adress[i].innerText)
-        window.location.href="homePage.html"
-    })
-}
-
-function book (booking, name, adress){
-    booking["name"]= name
-    booking["adress"]= adress
-    console.log(booking)
-}
-
 function displayElements(element){
     main.innerHTML=""
     for(let i=0;i<element.length;i++){
@@ -106,5 +93,38 @@ function displayElements(element){
             
     </section>
 `
+    }
+
+    for(let i=0; i<contact.length; i++){
+        contact[i].addEventListener("click",function(){
+            book(booking,name[i].innerText, adress[i].innerText)  
+        })
+    }
+}
+
+ async function book (booking, name, adress){
+    booking["name"]= name
+    booking["adress"]= adress
+    try {
+        // Send the booking data to the backend
+        const response = await fetch("http://127.0.0.1:5000/donors", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(booking), // Convert booking object to JSON
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log("Order stored successfully:", responseData);
+
+            // Optionally navigate to another page
+            window.location.href = "profile-recipient.html";
+        } else {
+            console.error("Failed to store order:", response.statusText);
+        }
+    } catch (error) {
+        console.error("Error in booking process:", error);
     }
 }
