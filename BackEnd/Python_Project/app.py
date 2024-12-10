@@ -2,7 +2,11 @@ from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL
 from flask_cors import CORS
 import bcrypt
+import jwt
+import datetime
 from functools import wraps
+import os
+
 app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin Resource Sharing (optional for frontend-backend separation)
 
@@ -64,7 +68,7 @@ def register():
     email = data.get('email')
     password = data.get('password')
 
-    if not first_name or not last_name or not email or not password:
+    if not all([first_name, last_name, email, password]):
         return jsonify({'message': 'All fields are required'}), 400
 
     hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -95,7 +99,7 @@ def add_recipient():
     blood_type = data.get('bloodType')
     city = data.get('city')
 
-    if not first_name or not last_name or not email or not blood_type or not city:
+    if not all([first_name, last_name, email, blood_type, city]):
         return jsonify({'message': 'All fields are required'}), 400
 
     cur = mysql.connection.cursor()
@@ -113,17 +117,23 @@ def add_recipient():
 @app.route('/branches', methods=['GET'])
 def branches():
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM branch")
-    branches = cur.fetchall()
-    return jsonify({'branches': branches}), 200
+    try:
+        cur.execute("SELECT * FROM branch")
+        branches = cur.fetchall()
+        return jsonify({'branches': branches}), 200
+    except Exception as e:
+        return jsonify({'message': f'Error: {str(e)}'}), 500
 
 # Route for listing all available blood units
 @app.route('/blood_units', methods=['GET'])
 def blood_units():
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM blood_unit_tobedonated")
-    blood_units = cur.fetchall()
-    return jsonify({'blood_units': blood_units}), 200
+     try:
+        cur.execute("SELECT * FROM blood_unit_tobedonated")
+        blood_units = cur.fetchall()
+        return jsonify({'blood_units': blood_units}), 200
+    except Exception as e:
+        return jsonify({'message': f'Error: {str(e)}'}), 500
 
 # Route for listing donors
 @app.route('/donors', methods=['GET'])
