@@ -85,24 +85,26 @@ def register():
 def profile(user):
     return jsonify({'user': {'firstName': user[1], 'lastName': user[2], 'email': user[3]}}), 200
 
-# Route for adding a blood sample test
-@app.route('/add_test', methods=['POST'])
-@token_required
-def add_test(user):
+# Route for adding a recipient
+@app.route('/add_recipient', methods=['POST'])
+def add_recipient():
     data = request.get_json()
-    sobriety = data.get('sobriety')
-    last_donated_date = data.get('last_donated_date')
-    disease = data.get('disease')
-    BMI = data.get('BMI')
-    hemoglobin = data.get('hemoglobin')
-    iron_levels = data.get('iron_levels')
+    first_name = data.get('firstName')
+    last_name = data.get('lastName')
+    email = data.get('email')
+    blood_type = data.get('bloodType')
+    city = data.get('city')
+
+    if not first_name or not last_name or not email or not blood_type or not city:
+        return jsonify({'message': 'All fields are required'}), 400
 
     cur = mysql.connection.cursor()
     try:
-        cur.execute("INSERT INTO blood_sample_test (sobriety, last_donated_date, disease, BMI, hemoglobin, iron_levels) VALUES (%s, %s, %s, %s, %s, %s)",
-                    (sobriety, last_donated_date, disease, BMI, hemoglobin, iron_levels))
+        cur.execute(
+            "INSERT INTO recipient (firstName, lastName, email, blood_type, city) VALUES (%s, %s, %s, %s, %s)",
+            (first_name, last_name, email, blood_type, city))
         mysql.connection.commit()
-        return jsonify({'message': 'Test added successfully'}), 201
+        return jsonify({'message': 'Recipient added successfully'}), 201
     except Exception as e:
         mysql.connection.rollback()
         return jsonify({'message': f'Error: {str(e)}'}), 500
