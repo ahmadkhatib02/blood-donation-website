@@ -2,10 +2,8 @@ from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL
 from flask_cors import CORS
 import bcrypt
-import jwt
 import datetime
 from functools import wraps
-import os
 
 app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin Resource Sharing (optional for frontend-backend separation)
@@ -112,6 +110,51 @@ def add_recipient():
     except Exception as e:
         mysql.connection.rollback()
         return jsonify({'message': f'Error: {str(e)}'}), 500
+
+# Route to fetch recipient information by ID or email
+@app.route('/recipient_info', methods=['GET'])
+def recipient_info():
+    # Get the recipient_ID or email from the request arguments
+    recipient_id = request.args.get('recipient_ID')
+    email = request.args.get('email')
+
+    if not recipient_id and not email:
+        return jsonify({'message': 'recipient_ID or email is required'}), 400
+
+    cur = mysql.connection.cursor()
+    try:
+        # Query based on the provided identifier
+        if recipient_id:
+            cur.execute(
+                "SELECT recipient_ID, firstName, lastName, email, blood_type, city FROM recipient WHERE recipient_ID = %s",
+                (recipient_id,)
+            )
+        elif email:
+            cur.execute(
+                "SELECT recipient_ID, firstName, lastName, email, blood_type, city FROM recipient WHERE email = %s",
+                (email,)
+            )
+
+        # Fetch the recipient info
+        recipient = cur.fetchone()
+
+        if not recipient:
+            return jsonify({'message': 'Recipient not found'}), 404
+
+        # Format the recipient data as JSON
+        result = {
+            'recipient_ID': recipient[0],
+            'firstName': recipient[1],
+            'lastName': recipient[2],
+            'email': recipient[3],
+            'blood_type': recipient[4],
+            'city': recipient[5],
+        }
+        return jsonify({'recipient': result}), 200
+    except Exception as e:
+        return jsonify({'message': f'Error: {str(e)}'}), 500
+    finally:
+        cur.close()
 
 # Route for listing all branches
 @app.route('/branches', methods=['GET'])
