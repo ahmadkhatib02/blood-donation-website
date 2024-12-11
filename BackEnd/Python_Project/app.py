@@ -186,16 +186,16 @@ def donors():
     donors = cur.fetchall()
     return jsonify({'donors': donors}), 200
 
-# store the order of blood and recipient
-def store_order(cursor, blood_id, recipient_id, branch_id):
+# Store the appointment details
+def appointment(cursor, apt_id, donor_id, branch_id, blood_id):
     try:
         query = """
-        INSERT INTO orders (blood_ID, recipient_ID, branch_ID)
-        VALUES (%s, %s, %s)
+        INSERT INTO appointment (apt_id, donor_id, branch_id, blood_id)
+        VALUES (%s, %s, %s, %s)
         """
-        cursor.execute(query, (blood_id, recipient_id, branch_id))
-        print("Order stored successfully.")
-    except mysql.connector.Error as err:
+        cursor.execute(query, (apt_id, donor_id, branch_id, blood_id))
+        print("Appointment stored successfully.")
+    except Exception as err:
         print(f"Error: {err}")
 
 # get the donor info - blood type and such
