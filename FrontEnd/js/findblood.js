@@ -16,20 +16,22 @@ form.addEventListener("submit", async (event) => {
     event.preventDefault(); // Prevent the form from refreshing the page
 
     // Collect form data
+    
     const firstName = document.getElementById("firstName").value.trim();
     const lastName = document.getElementById("lastName").value.trim();
     const email = document.getElementById("email").value.trim();
     const bloodGroup = document.getElementById("bloodGroup").value;
-    const city = document.getElementById("cities").value;
-    // Validate form data
-    if (!firstName || !lastName || !email || !bloodGroup) {
+    const city = document.getElementById("c1").value;
+    
+    // Validate form data 
+    if (!firstName || !lastName || !email || !bloodGroup || !city) {
         alert("Please fill in all the fields.");
         return;
     }
 
     try {
         // Send a POST request to the backend /register endpoint
-        const response = await fetch("http://localhost:5000/register", {
+        const response = await fetch("http://localhost:5000/add_recipient", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -38,7 +40,7 @@ form.addEventListener("submit", async (event) => {
                 firstName,
                 lastName,
                 email,
-                bloodGroup,
+                blood_type: bloodGroup,
                 city
             })
         });
@@ -48,7 +50,7 @@ form.addEventListener("submit", async (event) => {
         if (response.ok) {
             alert(data.message); // Show success message
             // Redirect to the login page or another page
-            window.location.href = "login.html";
+            window.location.href = "bloodbanks.html";
         } else {
             alert(data.message || "Registration failed. Please try again.");
         }

@@ -18,31 +18,35 @@ USE `blooddonation`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `blood_sample_test`
+-- Table structure for table `appointment`
 --
 
-DROP TABLE IF EXISTS `blood_sample_test`;
+DROP TABLE IF EXISTS `appointment`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `blood_sample_test` (
-  `test_ID` int NOT NULL AUTO_INCREMENT,
-  `sobriety` enum('Yes','No') DEFAULT NULL,
-  `last_donated_date` date DEFAULT NULL,
-  `disease` text,
-  `BMI` decimal(5,2) DEFAULT NULL,
-  `hemoglobin` decimal(4,2) DEFAULT NULL,
-  `iron_levels` decimal(4,2) DEFAULT NULL,
-  PRIMARY KEY (`test_ID`)
+CREATE TABLE `appointment` (
+  `apt_id` int NOT NULL,
+  `apt_date` datetime DEFAULT NULL,
+  `donor_id` int DEFAULT NULL,
+  `branch_id` int DEFAULT NULL,
+  `blood_id` int DEFAULT NULL,
+  PRIMARY KEY (`apt_id`),
+  KEY `donor_id` (`donor_id`),
+  KEY `branch_id` (`branch_id`),
+  KEY `blood_id` (`blood_id`),
+  CONSTRAINT `appointment_ibfk_1` FOREIGN KEY (`donor_id`) REFERENCES `donor` (`donor_ID`),
+  CONSTRAINT `appointment_ibfk_2` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`branch_ID`),
+  CONSTRAINT `appointment_ibfk_3` FOREIGN KEY (`blood_id`) REFERENCES `blood_unit_tobedonated` (`blood_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `blood_sample_test`
+-- Dumping data for table `appointment`
 --
 
-LOCK TABLES `blood_sample_test` WRITE;
-/*!40000 ALTER TABLE `blood_sample_test` DISABLE KEYS */;
-/*!40000 ALTER TABLE `blood_sample_test` ENABLE KEYS */;
+LOCK TABLES `appointment` WRITE;
+/*!40000 ALTER TABLE `appointment` DISABLE KEYS */;
+/*!40000 ALTER TABLE `appointment` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -56,7 +60,6 @@ CREATE TABLE `blood_unit_tobedonated` (
   `blood_ID` int NOT NULL AUTO_INCREMENT,
   `blood_type` enum('A','B','AB','O') DEFAULT NULL,
   `rhesus` enum('+','-') DEFAULT NULL,
-  `factor` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`blood_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -110,8 +113,13 @@ CREATE TABLE `donor` (
   `blood_type` enum('A','B','AB','O') DEFAULT NULL,
   `rhesus` enum('+','-') DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
+  `blood_id` int DEFAULT NULL,
   PRIMARY KEY (`donor_ID`),
-  CONSTRAINT `donor_ibfk_1` FOREIGN KEY (`donor_ID`) REFERENCES `individual` (`individual_ID`)
+  KEY `fkblood` (`blood_id`),
+  CONSTRAINT `donor_ibfk_1` FOREIGN KEY (`donor_ID`) REFERENCES `individual` (`individual_ID`),
+  CONSTRAINT `fkblood` FOREIGN KEY (`blood_id`) REFERENCES `blood_unit_tobedonated` (`blood_ID`),
+  CONSTRAINT `chkbloodtype` CHECK ((`blood_type` in (_utf8mb4'A',_utf8mb4'B',_utf8mb4'AB',_utf8mb4'O'))),
+  CONSTRAINT `chkrhesus` CHECK ((`rhesus` in (_utf8mb4'positive',_utf8mb4'negative')))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -137,7 +145,10 @@ CREATE TABLE `health_care_professional` (
   `lastName` varchar(50) DEFAULT NULL,
   `phoneNumber` varchar(20) DEFAULT NULL,
   `city` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`hc_professional_ID`)
+  `branch_id` int DEFAULT NULL,
+  PRIMARY KEY (`hc_professional_ID`),
+  KEY `fkb_ranch` (`branch_id`),
+  CONSTRAINT `fkb_ranch` FOREIGN KEY (`branch_id`) REFERENCES `branch` (`branch_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -147,7 +158,7 @@ CREATE TABLE `health_care_professional` (
 
 LOCK TABLES `health_care_professional` WRITE;
 /*!40000 ALTER TABLE `health_care_professional` DISABLE KEYS */;
-INSERT INTO `health_care_professional` VALUES (1,'Hassan','El Hage','01 234 567','Beirut'),(2,'Maya','Karam','01 456 789','Beirut'),(3,'Rami','Abou Khalil','09 876 543','Jounieh'),(4,'Sarah','Nasr','07 123 456','Saida'),(5,'Tarek','Haddad','08 765 432','Zahle'),(6,'Lina','Aoun','06 234 567','Tripoli'),(7,'Karim','Shoueiry','04 543 210','Antelias'),(8,'Rania','Fakhry','01 678 901','Beirut'),(9,'Nour','Daou','06 890 123','Halba'),(10,'Ali','Merhi','07 456 789','Nabatieh'),(11,'Fadi','Ghosn','01 345 678','Hazmieh'),(12,'Hala','Sleiman','09 567 890','Jbeil'),(13,'Ahmad','Kassem','07 890 123','Tyre'),(14,'Jad','Bou Saab','01 678 234','Achrafieh'),(15,'Reem','Salameh','01 987 654','Beirut'),(16,'Yara','Itani','08 321 456','Beit Eddine'),(17,'Marwan','Fayyad','06 765 432','Tripoli'),(18,'Elie','Chahine','09 123 456','Jounieh'),(19,'Joelle','Abou Nader','07 234 567','Saida'),(20,'Bassam','Rahme','08 876 543','Zahle');
+INSERT INTO `health_care_professional` VALUES (1,'Hassan','El Hage','01 234 567','Beirut',14),(2,'Maya','Karam','01 456 789','Beirut',3),(3,'Rami','Abou Khalil','09 876 543','Jounieh',18),(4,'Sarah','Nasr','07 123 456','Saida',12),(5,'Tarek','Haddad','08 765 432','Zahle',26),(6,'Lina','Aoun','06 234 567','Tripoli',7),(7,'Karim','Shoueiry','04 543 210','Antelias',9),(8,'Rania','Fakhry','01 678 901','Beirut',14),(9,'Nour','Daou','06 890 123','Halba',19),(10,'Ali','Merhi','07 456 789','Nabatieh',22),(11,'Fadi','Ghosn','01 345 678','Hazmieh',5),(12,'Hala','Sleiman','09 567 890','Jbeil',21),(13,'Ahmad','Kassem','07 890 123','Tyre',8),(14,'Jad','Bou Saab','01 678 234','Achrafieh',30),(15,'Reem','Salameh','01 987 654','Beirut',14),(16,'Yara','Itani','08 321 456','Beit Eddine',27),(17,'Marwan','Fayyad','06 765 432','Tripoli',7),(18,'Elie','Chahine','09 123 456','Jounieh',18),(19,'Joelle','Abou Nader','07 234 567','Saida',12),(20,'Bassam','Rahme','08 876 543','Zahle',26);
 /*!40000 ALTER TABLE `health_care_professional` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -166,8 +177,10 @@ CREATE TABLE `individual` (
   `city` varchar(50) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
   `password` varchar(100) DEFAULT NULL,
+  `phoneNumber` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`individual_ID`),
-  UNIQUE KEY `email` (`email`)
+  UNIQUE KEY `email` (`email`),
+  CONSTRAINT `chk_gender` CHECK ((`gender` in (_utf8mb4'M',_utf8mb4'F')))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -192,9 +205,13 @@ CREATE TABLE `recipient` (
   `email` varchar(100) DEFAULT NULL,
   `firstName` varchar(50) DEFAULT NULL,
   `lastName` varchar(50) DEFAULT NULL,
-  `blood_type` enum('A','B','AB','O') DEFAULT NULL,
+  `blood_type` varchar(3) DEFAULT NULL,
   `city` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`recipient_ID`)
+  `phoneNumber` varchar(20) DEFAULT NULL,
+  `blood_id` int DEFAULT NULL,
+  PRIMARY KEY (`recipient_ID`),
+  KEY `fk_blood` (`blood_id`),
+  CONSTRAINT `fk_blood` FOREIGN KEY (`blood_id`) REFERENCES `blood_unit_tobedonated` (`blood_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -216,4 +233,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-02 19:03:01
+-- Dump completed on 2024-12-11  0:45:18

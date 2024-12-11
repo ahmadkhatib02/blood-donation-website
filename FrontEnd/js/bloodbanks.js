@@ -9,6 +9,40 @@ let booking = new Object();
 let allLocations = {}
 
 
+//fetching the city
+async function getRecipientInfo(recipientId) {
+    const url = `http://localhost:5000/recipient/${recipientId}`; // Replace with your backend URL
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // Add Authorization header if required
+                // 'Authorization': 'Bearer YOUR_TOKEN_HERE'
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} - ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log(data);
+        // Do something with the data (e.g., display it on the UI)
+        return data.recipient;
+    } catch (error) {
+        console.error('Error fetching recipient info:', error);
+    }
+}
+
+// Example usage
+getRecipientInfo(1).then((recipient) => {
+    if (recipient) {
+        console.log(`Recipient Name: ${recipient.firstName} ${recipient.lastName}`);
+    } else {
+        console.log('Recipient not found.');
+    }
+});
 
 //fetching all the data
 async function fetchLocations() {
@@ -78,6 +112,9 @@ hospital.addEventListener("click",function(){
 })
 
 function displayElements(element){
+    for (let j=0; j<element.length;j++){
+
+    }
     main.innerHTML=""
     for(let i=0;i<element.length;i++){
         main.innerHTML += `  

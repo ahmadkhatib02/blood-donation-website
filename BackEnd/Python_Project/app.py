@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL
 from flask_cors import CORS
 import bcrypt
-import datetime
 from functools import wraps
 
 app = Flask(__name__)
@@ -94,7 +93,7 @@ def add_recipient():
     first_name = data.get('firstName')
     last_name = data.get('lastName')
     email = data.get('email')
-    blood_type = data.get('bloodType')
+    blood_type = data.get('blood_type')
     city = data.get('city')
 
     if not all([first_name, last_name, email, blood_type, city]):
@@ -111,51 +110,6 @@ def add_recipient():
         mysql.connection.rollback()
         return jsonify({'message': f'Error: {str(e)}'}), 500
 
-# Route to fetch recipient information by ID or email
-@app.route('/recipient_info', methods=['GET'])
-def recipient_info():
-    # Get the recipient_ID or email from the request arguments
-    recipient_id = request.args.get('recipient_ID')
-    email = request.args.get('email')
-
-    if not recipient_id and not email:
-        return jsonify({'message': 'recipient_ID or email is required'}), 400
-
-    cur = mysql.connection.cursor()
-    try:
-        # Query based on the provided identifier
-        if recipient_id:
-            cur.execute(
-                "SELECT recipient_ID, firstName, lastName, email, blood_type, city FROM recipient WHERE recipient_ID = %s",
-                (recipient_id,)
-            )
-        elif email:
-            cur.execute(
-                "SELECT recipient_ID, firstName, lastName, email, blood_type, city FROM recipient WHERE email = %s",
-                (email,)
-            )
-
-        # Fetch the recipient info
-        recipient = cur.fetchone()
-
-        if not recipient:
-            return jsonify({'message': 'Recipient not found'}), 404
-
-        # Format the recipient data as JSON
-        result = {
-            'recipient_ID': recipient[0],
-            'firstName': recipient[1],
-            'lastName': recipient[2],
-            'email': recipient[3],
-            'blood_type': recipient[4],
-            'city': recipient[5],
-        }
-        return jsonify({'recipient': result}), 200
-    except Exception as e:
-        return jsonify({'message': f'Error: {str(e)}'}), 500
-    finally:
-        cur.close()
-
 # Route for listing all branches
 @app.route('/branches', methods=['GET'])
 def branches():
@@ -171,7 +125,7 @@ def branches():
 @app.route('/blood_units', methods=['GET'])
 def blood_units():
     cur = mysql.connection.cursor()
-     try:
+    try:
         cur.execute("SELECT * FROM blood_unit_tobedonated")
         blood_units = cur.fetchall()
         return jsonify({'blood_units': blood_units}), 200
@@ -186,16 +140,16 @@ def donors():
     donors = cur.fetchall()
     return jsonify({'donors': donors}), 200
 
-# Store the appointment details
-def appointment(cursor, apt_id, donor_id, branch_id, blood_id):
+# store the order of blood and recipient
+def store_order(cursor, blood_id, recipient_id, branch_id):
     try:
         query = """
-        INSERT INTO appointment (apt_id, donor_id, branch_id, blood_id)
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO orders (blood_ID, recipient_ID, branch_ID)
+        VALUES (%s, %s, %s)
         """
-        cursor.execute(query, (apt_id, donor_id, branch_id, blood_id))
-        print("Appointment stored successfully.")
-    except Exception as err:
+        cursor.execute(query, (blood_id, recipient_id, branch_id))
+        print("Order stored successfully.")
+    except mysql.connector.Error as err:
         print(f"Error: {err}")
 
 # get the donor info - blood type and such
@@ -225,43 +179,6 @@ def get_recipient_info(cursor, recipient_id):
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
-# get the name, address and contact number for the reservation 
-@app.route('/appointment_branch_info', methods=['GET'])
-def appointment_branch_info():
-    appointment_id = request.args.get('appointment_id')
-
-    if not appointment_id:
-        return jsonify({'message': 'Appointment ID is required'}), 400
-
-    cur = mysql.connection.cursor()
-    try:
-        query = """
-        SELECT a.apt_id, b.name, b.city, b.street, b.phoneNumber
-        FROM appointment a
-        JOIN branch b ON a.branch_id = b.branch_ID
-        WHERE a.apt_id = %s
-        """
-        cur.execute(query, (appointment_id,))
-        result = cur.fetchone()
-
-        if not result:
-            return jsonify({'message': 'No appointment or branch info found for the given ID'}), 404
-
-        response = {
-            'appointment_id': result[0],
-            'branch_name': result[1],
-            'address': {
-                'city': result[2],
-                'street': result[3]
-            },
-            'contact_number': result[4]
-        }
-
-        return jsonify({'appointment_branch_info': response}), 200
-    except Exception as e:
-        return jsonify({'message': f'Error: {str(e)}'}), 500
-    finally:
-        cur.close()
 
 # get organization info
 def get_organization_info(cursor, branch_id):
