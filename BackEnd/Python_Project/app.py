@@ -225,6 +225,44 @@ def get_recipient_info(cursor, recipient_id):
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
+# get the name, address and contact number for the reservation 
+@app.route('/appointment_branch_info', methods=['GET'])
+def appointment_branch_info():
+    appointment_id = request.args.get('appointment_id')
+
+    if not appointment_id:
+        return jsonify({'message': 'Appointment ID is required'}), 400
+
+    cur = mysql.connection.cursor()
+    try:
+        query = """
+        SELECT a.apt_id, b.name, b.city, b.street, b.phoneNumber
+        FROM appointment a
+        JOIN branch b ON a.branch_id = b.branch_ID
+        WHERE a.apt_id = %s
+        """
+        cur.execute(query, (appointment_id,))
+        result = cur.fetchone()
+
+        if not result:
+            return jsonify({'message': 'No appointment or branch info found for the given ID'}), 404
+
+        response = {
+            'appointment_id': result[0],
+            'branch_name': result[1],
+            'address': {
+                'city': result[2],
+                'street': result[3]
+            },
+            'contact_number': result[4]
+        }
+
+        return jsonify({'appointment_branch_info': response}), 200
+    except Exception as e:
+        return jsonify({'message': f'Error: {str(e)}'}), 500
+    finally:
+        cur.close()
+
 # get organization info
 def get_organization_info(cursor, branch_id):
     try:
