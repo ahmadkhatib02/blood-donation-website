@@ -72,7 +72,7 @@ def register():
 
     cur = mysql.connection.cursor()
     try:
-        cur.execute("INSERT INTO individual (firstName, lastName, email, password) VALUES (%s, %s, %s, %s)",
+        cur.execute("INSERT INTO individual (first_Name, last_Name, email, password) VALUES (%s, %s, %s, %s)",
                     (first_name, last_name, email, hashed_pw.decode('utf-8')))
         mysql.connection.commit()
         return jsonify({'message': 'User registered successfully'}), 201
@@ -84,7 +84,7 @@ def register():
 @app.route('/profile', methods=['GET'])
 @token_required
 def profile(user):
-    return jsonify({'user': {'firstName': user[1], 'lastName': user[2], 'email': user[3]}}), 200
+    return jsonify({'user': {'first_Name': user[1], 'last_Name': user[2], 'email': user[3]}}), 200
 
 # Route for adding a recipient
 @app.route('/add_recipient', methods=['POST'])
@@ -153,7 +153,7 @@ def store_order(cursor, blood_id, recipient_id, branch_id):
 def get_donor_info(cursor, donor_id):
     try:
         query = """
-        SELECT d.donor_ID, i.firstName, i.lastName, i.email, d.blood_type, d.rhesus
+        SELECT d.donor_ID, i.first_Name, i.last_Name, i.email, d.blood_type, d.rhesus
         FROM donor d
         JOIN individual i ON d.donor_ID = i.individual_ID
         WHERE d.donor_ID = %s
@@ -167,7 +167,7 @@ def get_donor_info(cursor, donor_id):
 def get_recipient_info(cursor, recipient_id):
     try:
         query = """
-        SELECT recipient_ID, firstName, lastName, email, blood_type, city
+        SELECT recipient_ID, first_Name, last_Name, email, blood_type, city
         FROM recipient
         WHERE recipient_ID = %s
         """
@@ -181,7 +181,7 @@ def get_recipient_info(cursor, recipient_id):
 def get_organization_info(cursor, branch_id):
     try:
         query = """
-        SELECT branch_ID, name, phoneNumber, city, street
+        SELECT branch_ID, branch_name, phoneNumber, city, street
         FROM branch
         WHERE branch_ID = %s
         """
