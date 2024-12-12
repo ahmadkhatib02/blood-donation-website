@@ -122,13 +122,13 @@ DROP TABLE IF EXISTS `donor`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `donor` (
   `donor_id` int NOT NULL AUTO_INCREMENT,
-  `individual_id` int NOT NULL,
+  `email` varchar(60) NOT NULL,
   `blood_type` varchar(2) NOT NULL,
   `rhesus` char(1) DEFAULT NULL,
   `isQualified` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`donor_id`),
-  KEY `individual_id` (`individual_id`),
-  CONSTRAINT `donor_ibfk_1` FOREIGN KEY (`individual_id`) REFERENCES `individual` (`individual_id`),
+  KEY `email` (`email`),
+  CONSTRAINT `donor_ibfk_1` FOREIGN KEY (`email`) REFERENCES `individual` (`email`),
   CONSTRAINT `donor_chk_1` CHECK ((`blood_type` in (_utf8mb4'A',_utf8mb4'B',_utf8mb4'O',_utf8mb4'AB'))),
   CONSTRAINT `donor_chk_2` CHECK ((`rhesus` in (_utf8mb4'positive',_utf8mb4'negative')))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -183,7 +183,6 @@ DROP TABLE IF EXISTS `individual`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `individual` (
-  `individual_id` int NOT NULL AUTO_INCREMENT,
   `first_name` varchar(50) NOT NULL,
   `last_name` varchar(50) NOT NULL,
   `gender` char(1) NOT NULL,
@@ -191,8 +190,7 @@ CREATE TABLE `individual` (
   `email` varchar(60) NOT NULL,
   `password` varchar(200) DEFAULT NULL,
   `city` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`individual_id`),
-  UNIQUE KEY `email` (`email`),
+  PRIMARY KEY (`email`),
   CONSTRAINT `individual_chk_1` CHECK ((`gender` in (_utf8mb4'M',_utf8mb4'F')))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -239,4 +237,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-12 12:12:30
+-- Dump completed on 2024-12-12 13:31:06
