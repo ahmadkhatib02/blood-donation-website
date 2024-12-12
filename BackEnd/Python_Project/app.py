@@ -59,7 +59,7 @@ def login():
 # Route for registering a new user
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
+    data = request.get_json()   
     first_name = data.get('firstName')
     last_name = data.get('lastName')
     email = data.get('email')
@@ -90,20 +90,17 @@ def profile(user):
 @app.route('/add_recipient', methods=['POST'])
 def add_recipient():
     data = request.get_json()
-    first_name = data.get('firstName')
-    last_name = data.get('lastName')
     email = data.get('email')
     blood_type = data.get('blood_type')
-    city = data.get('city')
 
-    if not all([first_name, last_name, email, blood_type, city]):
+    if not all([email, blood_type]):
         return jsonify({'message': 'All fields are required'}), 400
 
     cur = mysql.connection.cursor()
     try:
         cur.execute(
-            "INSERT INTO recipient (firstName, lastName, email, blood_type, city) VALUES (%s, %s, %s, %s, %s)",
-            (first_name, last_name, email, blood_type, city))
+            "INSERT INTO recipient (blood_type, email) VALUES (%s, %s)",
+            (blood_type, email))
         mysql.connection.commit()
         return jsonify({'message': 'Recipient added successfully'}), 201
     except Exception as e:
@@ -231,9 +228,9 @@ def locations():
     try:
         # Determine query based on type
         if location_type == 'H':  # Hospitals
-            query = "SELECT branch_ID, name, city, street, phoneNumber FROM branch WHERE name NOT LIKE 'Lebanese Red Cross%'"
+            query = "SELECT branch_ID, branch_name, city, street, phoneNumber FROM branch WHERE branch_name NOT LIKE 'Lebanese Red Cross%'"
         elif location_type == 'R':  # Red Cross branches
-            query = "SELECT branch_ID, name, city, street, phoneNumber FROM branch WHERE name LIKE 'Lebanese Red Cross%'"
+            query = "SELECT branch_ID, branch_name, city, street, phoneNumber FROM branch WHERE branch_name LIKE 'Lebanese Red Cross%'"
 
         # Execute query
         cur.execute(query)
@@ -243,7 +240,7 @@ def locations():
         result = [
             {
                 'id': branch[0],
-                'name': branch[1],
+                'branch_name': branch[1],
                 'city': branch[2],
                 'street': branch[3],
                 'phone': branch[4]

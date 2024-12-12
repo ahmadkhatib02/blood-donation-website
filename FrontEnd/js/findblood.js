@@ -21,10 +21,9 @@ form.addEventListener("submit", async (event) => {
     const lastName = document.getElementById("lastName").value.trim();
     const email = document.getElementById("email").value.trim();
     const bloodGroup = document.getElementById("bloodGroup").value;
-    const city = document.getElementById("c1").value;
     
     // Validate form data 
-    if (!firstName || !lastName || !email || !bloodGroup || !city) {
+    if (!firstName || !lastName || !email || !bloodGroup) {
         alert("Please fill in all the fields.");
         return;
     }
@@ -37,11 +36,8 @@ form.addEventListener("submit", async (event) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                firstName,
-                lastName,
                 email,
                 blood_type: bloodGroup,
-                city
             })
         });
 
