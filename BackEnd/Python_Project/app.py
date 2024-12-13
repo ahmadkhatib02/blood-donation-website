@@ -15,7 +15,7 @@ app.config['MYSQL_DB'] = 'blooddonation'
 
 mysql = MySQL(app)
 
-# Helper function to check authentication (example for login)
+# Helper function to check authentication (example for login) - works
 def token_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -33,7 +33,7 @@ def token_required(f):
         return f(user, *args, **kwargs)
     return decorated_function
 
-# Route for user login (authentication)
+# Route for user login (authentication) - works
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -56,58 +56,73 @@ def login():
     else:
         return jsonify({'message': 'Invalid password'}), 400
 
-# Route for registering a new user
-@app.route('/register', methods=['POST'])
+# Registering the donors - works
+@app.route('/register', methods=['POST']) 
 def register():
-    data = request.get_json()   
+    data = request.get_json()
+    
     first_name = data.get('firstName')
     last_name = data.get('lastName')
     email = data.get('email')
     password = data.get('password')
+    city = data.get('city')
+    phoneNumber = data.get('phoneNumber')
+    gender = data.get('gender')
 
-    if not all([first_name, last_name, email, password]):
+    if not all([first_name, last_name, email, password, city, phoneNumber, gender]):
         return jsonify({'message': 'All fields are required'}), 400
 
+    # Hash the password before storing it
     hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
+    # Insert the new user into the database
     cur = mysql.connection.cursor()
     try:
-        cur.execute("INSERT INTO individual (first_Name, last_Name, email, password) VALUES (%s, %s, %s, %s)",
-                    (first_name, last_name, email, hashed_pw.decode('utf-8')))
+        # Insert all user details into the individual table
+        cur.execute("INSERT INTO individual (first_Name, last_Name, gender, phoneNumber, email, password, city) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                    (first_name, last_name, gender, phoneNumber, email, hashed_pw.decode('utf-8'), city))
         mysql.connection.commit()
         return jsonify({'message': 'User registered successfully'}), 201
     except Exception as e:
+        # Rollback the transaction in case of an error
         mysql.connection.rollback()
         return jsonify({'message': f'Error: {str(e)}'}), 500
 
-# Route for getting user profile (protected route)
+# Route for getting user profile (protected route) - works
 @app.route('/profile', methods=['GET'])
 @token_required
 def profile(user):
     return jsonify({'user': {'first_Name': user[1], 'last_Name': user[2], 'email': user[3]}}), 200
 
-# Route for adding a recipient
+# Adding recipient - works
 @app.route('/add_recipient', methods=['POST'])
 def add_recipient():
     data = request.get_json()
+    blood_type = data.get('blood-type')
     email = data.get('email')
-    blood_type = data.get('blood_type')
+    first_name = data.get('firstName')
+    last_name = data.get('lastName')
+    city = data.get('cities')  # Get 'cities' from frontend
 
-    if not all([email, blood_type]):
+    if not all([blood_type, email, first_name, last_name, city]):
         return jsonify({'message': 'All fields are required'}), 400
 
     cur = mysql.connection.cursor()
     try:
+        # Insert all the required fields into the recipient table
         cur.execute(
-            "INSERT INTO recipient (blood_type, email) VALUES (%s, %s)",
-            (blood_type, email))
+            "INSERT INTO recipient (blood_type, email, first_name, last_name, city) VALUES (%s, %s, %s, %s, %s)",
+            (blood_type, email, first_name, last_name, city))  # 'city' is used in the SQL query
         mysql.connection.commit()
         return jsonify({'message': 'Recipient added successfully'}), 201
     except Exception as e:
         mysql.connection.rollback()
         return jsonify({'message': f'Error: {str(e)}'}), 500
+    finally:
+        cur.close()
 
-# Route for listing all branches
+# Route for listing all branches - works
 @app.route('/branches', methods=['GET'])
 def branches():
     cur = mysql.connection.cursor()
@@ -118,7 +133,7 @@ def branches():
     except Exception as e:
         return jsonify({'message': f'Error: {str(e)}'}), 500
 
-# Route for listing all available blood units
+# Route for listing all available blood units - works?
 @app.route('/blood_units', methods=['GET'])
 def blood_units():
     cur = mysql.connection.cursor()
@@ -129,7 +144,7 @@ def blood_units():
     except Exception as e:
         return jsonify({'message': f'Error: {str(e)}'}), 500
 
-# Route for listing donors
+# Route for listing donors - works
 @app.route('/donors', methods=['GET'])
 def donors():
     cur = mysql.connection.cursor()
@@ -137,7 +152,7 @@ def donors():
     donors = cur.fetchall()
     return jsonify({'donors': donors}), 200
 
-# store the order of blood and recipient
+# store the order of blood and recipient - idk if useful
 def store_order(cursor, blood_id, recipient_id, branch_id):
     try:
         query = """
@@ -149,13 +164,13 @@ def store_order(cursor, blood_id, recipient_id, branch_id):
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
-# get the donor info - blood type and such
+# get the donor info - blood type and such - works
 def get_donor_info(cursor, donor_id):
     try:
         query = """
         SELECT d.donor_ID, i.first_Name, i.last_Name, i.email, d.blood_type, d.rhesus
         FROM donor d
-        JOIN individual i ON d.donor_ID = i.individual_ID
+        JOIN individual i ON d.email = i.email
         WHERE d.donor_ID = %s
         """
         cursor.execute(query, (donor_id,))
@@ -163,7 +178,7 @@ def get_donor_info(cursor, donor_id):
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
-# get recipient info such as blood type
+# get recipient info such as blood type - works
 def get_recipient_info(cursor, recipient_id):
     try:
         query = """
@@ -177,7 +192,7 @@ def get_recipient_info(cursor, recipient_id):
         print(f"Error: {err}")
 
 
-# get organization info
+# get organization info - not sure
 def get_organization_info(cursor, branch_id):
     try:
         query = """
@@ -190,7 +205,7 @@ def get_organization_info(cursor, branch_id):
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
-# create admin user and password
+# create admin user and password - not sure
 def create_admin_user(cursor, branch_id, email, password):
     try:
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -215,7 +230,7 @@ def create_admin_user(cursor, branch_id, email, password):
         print(f"Error: {err}")
 
 
-    # Route for listing hospitals and Red Cross locations
+    # Route for listing hospitals and Red Cross locations - works
 @app.route('/locations', methods=['GET'])
 def locations():
     location_type = request.args.get('type')  # 'H' for hospitals, 'R' for Red Cross branches
