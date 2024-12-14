@@ -33,7 +33,7 @@ def token_required(f):
         return f(user, *args, **kwargs)
     return decorated_function
 
-# Route for user login (authentication) - works
+# Route for user login (authentication) FOR DONOR - works
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -52,6 +52,29 @@ def login():
 
     # Check if password matches (assuming bcrypt is used for hashing passwords)
     if bcrypt.checkpw(password.encode('utf-8'), user[6].encode('utf-8')):  # user[6] is the password field
+        return jsonify({'message': 'Login successful'}), 200
+    else:
+        return jsonify({'message': 'Invalid password'}), 400
+
+# Route for healthcare professional login (authentication) - works
+@app.route('/hc_professional/login', methods=['POST'])
+def hc_professional_login():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({'message': 'Email and password are required'}), 400
+
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM hc_professional WHERE email=%s", (email,))
+    hc_professional = cur.fetchone()
+
+    if not hc_professional:
+        return jsonify({'message': 'Healthcare professional not found'}), 404
+
+    # Check if password matches (assuming bcrypt is used for hashing passwords)
+    if bcrypt.checkpw(password.encode('utf-8'), hc_professional[4].encode('utf-8')):  # hc_professional[4] is the password field
         return jsonify({'message': 'Login successful'}), 200
     else:
         return jsonify({'message': 'Invalid password'}), 400
