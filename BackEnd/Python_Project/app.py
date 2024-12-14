@@ -228,6 +228,41 @@ def get_organization_info(cursor, branch_id):
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
+# matching both donor and recipient for the hc_professional page 
+
+# get the info of the individual to the donor
+
+# add the apptdate 
+
+# isQualified implementation - depends on how we will use it!!!
+@app.route('/update_qualification', methods=['POST'])
+def update_qualification():
+    data = request.get_json()
+    
+    donor_id = data.get('donor_id')
+    isQualified = data.get('isQualified')
+    
+    if donor_id is None or isQualified is None:
+        return jsonify({'message': 'Donor ID and qualification status are required'}), 400
+    
+    if isQualified not in [0, 1]:
+        return jsonify({'message': 'Qualification status must be 0 or 1'}), 400
+    
+    cur = mysql.connection.cursor()
+    try:
+        # Update the isQualified field in the donor table
+        query = "UPDATE donor SET isQualified = %s WHERE donor_id = %s"
+        cur.execute(query, (isQualified, donor_id))
+        mysql.connection.commit()
+        
+        return jsonify({'message': f'Donor qualification status updated to {isQualified}'}), 200
+    except Exception as e:
+        mysql.connection.rollback()
+        return jsonify({'message': f'Error: {str(e)}'}), 500
+    finally:
+        cur.close()
+       
+
     # Route for listing hospitals and Red Cross locations - works
 @app.route('/locations', methods=['GET'])
 def locations():
