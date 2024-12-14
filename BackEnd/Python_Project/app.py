@@ -133,7 +133,7 @@ def branches():
     except Exception as e:
         return jsonify({'message': f'Error: {str(e)}'}), 500
 
-# Route for listing all available blood units - works?
+# Route for listing all available blood units - works
 @app.route('/blood_units', methods=['GET'])
 def blood_units():
     cur = mysql.connection.cursor()
@@ -192,7 +192,7 @@ def get_recipient_info(cursor, recipient_id):
         print(f"Error: {err}")
 
 
-# get organization info - not sure
+# get organization info - works
 def get_organization_info(cursor, branch_id):
     try:
         query = """
@@ -204,31 +204,6 @@ def get_organization_info(cursor, branch_id):
         return cursor.fetchone()
     except mysql.connector.Error as err:
         print(f"Error: {err}")
-
-# create admin user and password - not sure
-def create_admin_user(cursor, branch_id, email, password):
-    try:
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        query = """
-        INSERT INTO individual (email, password)
-        VALUES (%s, %s)
-        """
-        cursor.execute(query, (email, hashed_password))
-        
-        # Retrieve the admin's individual ID
-        cursor.execute("SELECT LAST_INSERT_ID()")
-        admin_id = cursor.fetchone()[0]
-
-        # Link to branch (if needed)
-        link_query = """
-        INSERT INTO branch_admin (admin_ID, branch_ID)
-        VALUES (%s, %s)
-        """
-        cursor.execute(link_query, (admin_id, branch_id))
-        print("Admin user created successfully.")
-    except mysql.connector.Error as err:
-        print(f"Error: {err}")
-
 
     # Route for listing hospitals and Red Cross locations - works
 @app.route('/locations', methods=['GET'])
