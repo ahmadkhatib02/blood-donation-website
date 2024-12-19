@@ -3,6 +3,10 @@ from flask_mysqldb import MySQL
 from flask_cors import CORS
 import bcrypt
 from functools import wraps
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 
 app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin Resource Sharing (optional for frontend-backend separation)
@@ -261,7 +265,84 @@ def update_qualification():
         return jsonify({'message': f'Error: {str(e)}'}), 500
     finally:
         cur.close()
-       
+
+
+def send_email(recipient_email, subject, body): #works
+    sender_email = "sawablood@gmail.com"
+    sender_password = "SawaBlood@december19"
+    
+    # Set up the server
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    
+    # Log into the server
+    server.login(sender_email, sender_password)
+    
+    # Create the email message
+    message = MIMEMultipart()
+    message['From'] = sender_email
+    message['To'] = recipient_email
+    message['Subject'] = subject
+    message.attach(MIMEText(body, 'plain'))
+    
+    # Send the email
+    server.sendmail(sender_email, recipient_email, message.as_string())
+    
+    # Close the server connection
+    server.quit()
+
+@app.route('/reserve', methods=['POST']) #idk
+def reserve():
+    # Check if the user is logged in
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    # Get reservation details from the POST request
+    branch_id = request.json.get('branch_id')
+    appointment_date = request.json.get('appointment_date')
+    hc_professional_id = request.json.get('hc_professional_id')
+
+    if not branch_id or not appointment_date or not hc_professional_id:
+        return jsonify({"error": "Branch ID, appointment date, and healthcare professional ID are required"}), 400
+
+    try:
+        # Connect to the MySQL database
+        conn = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="ahmadkhatib18",
+            database="blooddonation"
+        )
+        cursor = conn.cursor()
+
+        # Check if the donor exists
+        cursor.execute("SELECT email FROM donor WHERE donor_id = %s", (user_id,))
+        donor = cursor.fetchone()
+
+        if not donor:
+            return jsonify({"error": "Donor not found"}), 404
+
+        # Create a reservation
+        cursor.execute(
+            """
+            INSERT INTO appointment (appointment_date, donor_id, branch_id, hc_professional_id) 
+            VALUES (%s, %s, %s, %s)
+            """,
+            (appointment_date, user_id, branch_id, hc_professional_id)
+        )
+        conn.commit()
+
+        # Send confirmation email
+        recipient_email = donor[0]
+        subject = "Appointment Confirmation"
+        body = f"Dear donor,\n\nYour blood donation appointment has been successfully scheduled for {appointment_date}.\n\nThank you for saving lives!\n\nSawa Blood Team"
+        send_email(recipient_email, subject, body)
+
+        return jsonify({"message": "Reservation confirmed and email sent!"}), 200
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
 
     # Route for listing hospitals and Red Cross locations - works
 @app.route('/locations', methods=['GET'])
