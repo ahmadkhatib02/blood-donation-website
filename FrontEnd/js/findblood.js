@@ -38,6 +38,9 @@ form.addEventListener("submit", async (event) => {
             body: JSON.stringify({
                 email,
                 blood_type: bloodGroup,
+                firstName,
+                lastName,
+
             })
         });
 
