@@ -23,18 +23,16 @@ DROP TABLE IF EXISTS `recipient`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `recipient` (
-  `recipient_ID` int unsigned NOT NULL AUTO_INCREMENT,
-  `firstName` varchar(100) NOT NULL,
-  `lastName` varchar(100) NOT NULL,
-  `blood_type` char(3) NOT NULL,
-  `rhesus` char(1) DEFAULT NULL,
+  `recipient_ID` int NOT NULL AUTO_INCREMENT,
+  `firstName` varchar(50) NOT NULL,
+  `lastName` varchar(50) NOT NULL,
+  `blood_type` enum('A','B','AB','O') NOT NULL,
+  `rhesus` enum('+','-') NOT NULL,
   `email` varchar(255) NOT NULL,
-  `branch_ID` int unsigned NOT NULL,
+  `branch_ID` int NOT NULL,
   PRIMARY KEY (`recipient_ID`),
-  UNIQUE KEY `email` (`email`),
   KEY `branch_ID` (`branch_ID`),
-  CONSTRAINT `recipient_ibfk_1` FOREIGN KEY (`branch_ID`) REFERENCES `branch` (`branch_ID`) ON DELETE CASCADE,
-  CONSTRAINT `recipient_chk_1` CHECK ((`rhesus` in (_utf8mb4'+',_utf8mb4'-')))
+  CONSTRAINT `recipient_ibfk_1` FOREIGN KEY (`branch_ID`) REFERENCES `branch` (`branch_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -56,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-20  2:38:28
+-- Dump completed on 2024-12-20 12:37:02

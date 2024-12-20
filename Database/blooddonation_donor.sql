@@ -23,14 +23,13 @@ DROP TABLE IF EXISTS `donor`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `donor` (
-  `donorID` int unsigned NOT NULL AUTO_INCREMENT,
-  `blood_type` char(3) NOT NULL,
-  `rhesus` char(1) DEFAULT NULL,
+  `donor_ID` int NOT NULL AUTO_INCREMENT,
+  `blood_type` enum('A','B','AB','O') NOT NULL,
+  `rhesus` enum('+','-') NOT NULL,
   `email` varchar(255) NOT NULL,
-  PRIMARY KEY (`donorID`),
-  UNIQUE KEY `email` (`email`),
-  CONSTRAINT `donor_ibfk_1` FOREIGN KEY (`email`) REFERENCES `individual` (`email`) ON DELETE CASCADE,
-  CONSTRAINT `donor_chk_1` CHECK ((`rhesus` in (_utf8mb4'+',_utf8mb4'-')))
+  PRIMARY KEY (`donor_ID`),
+  KEY `email` (`email`),
+  CONSTRAINT `donor_ibfk_1` FOREIGN KEY (`email`) REFERENCES `individual` (`email`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -52,4 +51,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-20  2:38:28
+-- Dump completed on 2024-12-20 12:37:02

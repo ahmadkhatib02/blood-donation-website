@@ -23,20 +23,23 @@ DROP TABLE IF EXISTS `blood_sample_test`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `blood_sample_test` (
-  `blood_Test_ID` int unsigned NOT NULL AUTO_INCREMENT,
+  `blood_Test_ID` int NOT NULL AUTO_INCREMENT,
   `appointment_Date` date NOT NULL,
-  `sobriety` tinyint(1) NOT NULL,
+  `sobriety` enum('yes','no') NOT NULL,
   `last_Donated_Date` date DEFAULT NULL,
   `disease` varchar(255) DEFAULT NULL,
-  `BMI` decimal(5,2) DEFAULT NULL,
-  `hemoglobin` decimal(5,2) DEFAULT NULL,
-  `iron_levels` decimal(5,2) DEFAULT NULL,
-  `isQualified` tinyint(1) NOT NULL,
-  `donor_ID` int unsigned NOT NULL,
-  `blood_ID` int unsigned DEFAULT NULL,
+  `bMI` float NOT NULL,
+  `hemoglobin` float NOT NULL,
+  `iron_levels` float NOT NULL,
+  `isQualified` enum('yes','no') NOT NULL,
+  `donor_ID` int NOT NULL,
+  `blood_ID` int NOT NULL,
   PRIMARY KEY (`blood_Test_ID`),
   KEY `donor_ID` (`donor_ID`),
-  CONSTRAINT `blood_sample_test_ibfk_1` FOREIGN KEY (`donor_ID`) REFERENCES `donor` (`donorID`) ON DELETE CASCADE
+  CONSTRAINT `blood_sample_test_ibfk_1` FOREIGN KEY (`donor_ID`) REFERENCES `donor` (`donor_ID`) ON DELETE CASCADE,
+  CONSTRAINT `blood_sample_test_chk_1` CHECK ((`bMI` > 0)),
+  CONSTRAINT `blood_sample_test_chk_2` CHECK ((`hemoglobin` > 0)),
+  CONSTRAINT `blood_sample_test_chk_3` CHECK ((`iron_levels` > 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -58,4 +61,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-20  2:38:28
+-- Dump completed on 2024-12-20 12:37:02

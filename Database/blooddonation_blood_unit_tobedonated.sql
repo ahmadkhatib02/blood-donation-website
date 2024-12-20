@@ -23,20 +23,19 @@ DROP TABLE IF EXISTS `blood_unit_tobedonated`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `blood_unit_tobedonated` (
-  `blood_ID` int unsigned NOT NULL AUTO_INCREMENT,
-  `blood_type` char(3) NOT NULL,
-  `rhesus` char(1) DEFAULT NULL,
-  `donor_ID` int unsigned NOT NULL,
-  `recipient_ID` int unsigned DEFAULT NULL,
-  `branch_ID` int unsigned NOT NULL,
+  `blood_ID` int NOT NULL AUTO_INCREMENT,
+  `blood_type` enum('A','B','AB','O') NOT NULL,
+  `rhesus` enum('+','-') NOT NULL,
+  `donor_ID` int NOT NULL,
+  `recipient_ID` int NOT NULL,
+  `branch_ID` int NOT NULL,
   PRIMARY KEY (`blood_ID`),
   KEY `donor_ID` (`donor_ID`),
   KEY `recipient_ID` (`recipient_ID`),
   KEY `branch_ID` (`branch_ID`),
-  CONSTRAINT `blood_unit_tobedonated_ibfk_1` FOREIGN KEY (`donor_ID`) REFERENCES `donor` (`donorID`) ON DELETE CASCADE,
-  CONSTRAINT `blood_unit_tobedonated_ibfk_2` FOREIGN KEY (`recipient_ID`) REFERENCES `recipient` (`recipient_ID`) ON DELETE SET NULL,
-  CONSTRAINT `blood_unit_tobedonated_ibfk_3` FOREIGN KEY (`branch_ID`) REFERENCES `branch` (`branch_ID`) ON DELETE CASCADE,
-  CONSTRAINT `blood_unit_tobedonated_chk_1` CHECK ((`rhesus` in (_utf8mb4'+',_utf8mb4'-')))
+  CONSTRAINT `blood_unit_tobedonated_ibfk_1` FOREIGN KEY (`donor_ID`) REFERENCES `donor` (`donor_ID`) ON DELETE CASCADE,
+  CONSTRAINT `blood_unit_tobedonated_ibfk_2` FOREIGN KEY (`recipient_ID`) REFERENCES `recipient` (`recipient_ID`) ON DELETE CASCADE,
+  CONSTRAINT `blood_unit_tobedonated_ibfk_3` FOREIGN KEY (`branch_ID`) REFERENCES `branch` (`branch_ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -58,4 +57,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-20  2:38:28
+-- Dump completed on 2024-12-20 12:37:03

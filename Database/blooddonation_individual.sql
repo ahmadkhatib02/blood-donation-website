@@ -24,14 +24,13 @@ DROP TABLE IF EXISTS `individual`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `individual` (
   `email` varchar(255) NOT NULL,
-  `firstName` varchar(100) NOT NULL,
-  `lastName` varchar(100) NOT NULL,
-  `gender` char(1) DEFAULT NULL,
-  `phoneNumber` varchar(15) NOT NULL,
+  `firstName` varchar(50) NOT NULL,
+  `lastName` varchar(50) NOT NULL,
+  `gender` enum('female','male') NOT NULL,
+  `phoneNumber` varchar(20) NOT NULL,
   `city` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
-  PRIMARY KEY (`email`),
-  CONSTRAINT `individual_chk_1` CHECK ((`gender` in (_utf8mb4'M',_utf8mb4'F',_utf8mb4'O')))
+  PRIMARY KEY (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -53,4 +52,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-20  2:38:29
+-- Dump completed on 2024-12-20 12:37:02
