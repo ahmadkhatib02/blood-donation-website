@@ -14,12 +14,12 @@ CORS(app)  # Enable Cross-Origin Resource Sharing (optional for frontend-backend
 # Configuring MySQL database
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'  # Change to your MySQL username
-app.config['MYSQL_PASSWORD'] = 'ahmadkhatib18'  # Change to your MySQL password
+app.config['MYSQL_PASSWORD'] = 'ahmadkhatib18!'  # Change to your MySQL password
 app.config['MYSQL_DB'] = 'blooddonation'
 
 mysql = MySQL(app)
 
-# Helper function to check authentication (example for login) - works
+# Helper function to check authentication (example for login) 
 def token_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -37,9 +37,9 @@ def token_required(f):
         return f(user, *args, **kwargs)
     return decorated_function
 
-# Route for user login (authentication) FOR DONOR - works
+# Route for user login (authentication) FOR DONOR 
 @app.route('/login', methods=['POST'])
-def login():
+def donor_login():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
@@ -60,9 +60,9 @@ def login():
     else:
         return jsonify({'message': 'Invalid password'}), 400
 
-# Route for healthcare professional login (authentication) - works
-@app.route('/hc_professional/login', methods=['POST'])
-def hc_professional_login():
+# Route for healthcare professional login (authentication) 
+@app.route('/health_Care_Professional/login', methods=['POST'])
+def health_Care_Professional_login():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
@@ -71,85 +71,124 @@ def hc_professional_login():
         return jsonify({'message': 'Email and password are required'}), 400
 
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM hc_professional WHERE email=%s", (email,))
-    hc_professional = cur.fetchone()
+    cur.execute("SELECT * FROM Health_Care_Professional WHERE email=%s", (email,))
+    health_Care_Professional = cur.fetchone()
 
-    if not hc_professional:
+    if not health_Care_Professional:
         return jsonify({'message': 'Healthcare professional not found'}), 404
 
     # Check if password matches (assuming bcrypt is used for hashing passwords)
-    if bcrypt.checkpw(password.encode('utf-8'), hc_professional[4].encode('utf-8')):  # hc_professional[4] is the password field
+    if bcrypt.checkpw(password.encode('utf-8'), health_Care_Professional[4].encode('utf-8')):  # hc_professional[4] is the password field
         return jsonify({'message': 'Login successful'}), 200
     else:
         return jsonify({'message': 'Invalid password'}), 400
 
-# Registering the donors - works
-@app.route('/register', methods=['POST']) 
+# registering the donors
+@app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
     
-    first_name = data.get('firstName')
-    last_name = data.get('lastName')
-    email = data.get('email')
+    # Extract fields from the JSON payload
+    firstName = data.get('firstName')
+    lastName = data.get('lastName')
     password = data.get('password')
-    city = data.get('city')
     phoneNumber = data.get('phoneNumber')
+    email = data.get('email')
     gender = data.get('gender')
+    city = data.get('city')
+    blood_type = data.get('blood_type')
+    rhesus = data.get('rhesus')
 
-    if not all([first_name, last_name, email, password, city, phoneNumber, gender]):
-        return jsonify({'message': 'All fields are required'}), 400
+    # Check if all required fields are provided
+    if not all([firstName, lastName, email, password, city, phoneNumber, gender, blood_type, rhesus]):
+        return jsonify({'error': {'code': 400, 'message': 'All fields are required'}}), 400
 
-    # Hash the password before storing it
+    # Validate email format (basic regex)
+    import re
+    if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+        return jsonify({'error': {'code': 400, 'message': 'Invalid email format'}}), 400
+
+    # Validate password length
+    if len(password) < 6:
+        return jsonify({'error': {'code': 400, 'message': 'Password must be at least 6 characters long'}}), 400
+
+    # Hash the password
     hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-    # Insert the new user into the database
     cur = mysql.connection.cursor()
     try:
-        # Insert all user details into the individual table
-        cur.execute("INSERT INTO individual (first_Name, last_Name, gender, phoneNumber, email, password, city) "
-                    "VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                    (first_name, last_name, gender, phoneNumber, email, hashed_pw.decode('utf-8'), city))
+        # Insert user details into the individual table
+        cur.execute(
+            "INSERT INTO individual (email, firstName, lastName, gender, phoneNumber, city, password) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            (email, firstName, lastName, gender, phoneNumber, city, hashed_pw.decode('utf-8'))
+        )
+        cur.execute(
+            "INSERT INTO donor (blood_type, rhesus, email) "
+            "VALUES (%s, %s, %s)",
+            (blood_type, rhesus, email)
+        )
         mysql.connection.commit()
         return jsonify({'message': 'User registered successfully'}), 201
+    except pymysql.err.IntegrityError:
+        # Handle duplicate email errors
+        return jsonify({'error': {'code': 400, 'message': 'Email already exists'}}), 400
     except Exception as e:
-        # Rollback the transaction in case of an error
+        # Handle other database errors
         mysql.connection.rollback()
-        return jsonify({'message': f'Error: {str(e)}'}), 500
+        return jsonify({'error': {'code': 500, 'message': f'Error: {str(e)}'}}), 500
 
-# Route for getting user profile (protected route) - works
+
+# Route for getting user profile (protected route) 
 @app.route('/profile', methods=['GET'])
 @token_required
 def profile(user):
-    return jsonify({'user': {'first_Name': user[1], 'last_Name': user[2], 'email': user[3]}}), 200
+    return jsonify({'user': {'firstName': user[1], 'lastName': user[2], 'email': user[3]}}), 200
 
-# Adding recipient - works
+# Adding recipient 
 @app.route('/add_recipient', methods=['POST'])
 def add_recipient():
     data = request.get_json()
+    firstName = data.get('firstName')
+    lastName = data.get('lastName')
     blood_type = data.get('blood-type')
+    rhesus = data.get('rhesus')
     email = data.get('email')
-    first_name = data.get('firstName')
-    last_name = data.get('lastName')
-    city = data.get('cities')  # Get 'cities' from frontend
+    branch_Name = data.get('branch_Name') # I am using branch name so I can fill the FK donor_id
 
-    if not all([blood_type, email, first_name, last_name, city]):
+    if not all([firstName, lastName, blood_type, rhesus, email, branch_Name]):
         return jsonify({'message': 'All fields are required'}), 400
 
     cur = mysql.connection.cursor()
     try:
-        # Insert all the required fields into the recipient table
+        # Fetch the branch_ID based on branch_name so we can fill it 
+        cur.execute("SELECT branch_ID FROM branch WHERE branch_name = %s", (branch_Name,))
+        branch_ID = cur.fetchone()
+
+        if not branch_ID:
+            # If branch_name does not exist in the branch table - won't happen but better be safe than sorry
+            return jsonify({'message': 'Invalid branch name'}), 400
+
+        branch_ID = branch_ID['branch_ID']  # Extract the branch_ID from the result
+
+        # Insert recipient data into the recipient table
         cur.execute(
-            "INSERT INTO recipient (blood_type, email, first_name, last_name, city) VALUES (%s, %s, %s, %s, %s)",
-            (blood_type, email, first_name, last_name, city))  # 'city' is used in the SQL query
+            "INSERT INTO recipient (firstName, lastName, blood_type, rhesus, email, branch_ID) "
+            "VALUES (%s, %s, %s, %s, %s, %s)",
+            (firstName, lastName, blood_type, rhesus, email, branch_ID)
+        )
         mysql.connection.commit()
         return jsonify({'message': 'Recipient added successfully'}), 201
+
     except Exception as e:
+        # Rollback in case of error
         mysql.connection.rollback()
         return jsonify({'message': f'Error: {str(e)}'}), 500
     finally:
+        # Close the cursor
         cur.close()
 
-# Route for listing all branches - works
+# Route for listing all branches 
 @app.route('/branches', methods=['GET'])
 def branches():
     cur = mysql.connection.cursor()
@@ -160,7 +199,7 @@ def branches():
     except Exception as e:
         return jsonify({'message': f'Error: {str(e)}'}), 500
 
-# Route for listing all available blood units - works
+# Route for listing all available blood units 
 @app.route('/blood_units', methods=['GET'])
 def blood_units():
     cur = mysql.connection.cursor()
@@ -171,7 +210,7 @@ def blood_units():
     except Exception as e:
         return jsonify({'message': f'Error: {str(e)}'}), 500
 
-# Route for listing donors - works
+# Route for listing donors
 @app.route('/donors', methods=['GET'])
 def donors():
     cur = mysql.connection.cursor()
@@ -191,11 +230,11 @@ def store_order(cursor, blood_id, recipient_id, branch_id):
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
-# get the donor info - blood type and such - works
+# get the donor info - blood type and such 
 def get_donor_info(cursor, donor_id):
     try:
         query = """
-        SELECT d.donor_ID, i.first_Name, i.last_Name, i.email, d.blood_type, d.rhesus
+        SELECT d.donor_ID, i.firstName, i.lastName, i.email, d.blood_type, d.rhesus
         FROM donor d
         JOIN individual i ON d.email = i.email
         WHERE d.donor_ID = %s
@@ -205,11 +244,11 @@ def get_donor_info(cursor, donor_id):
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
-# get recipient info such as blood type - works
+# get recipient info  
 def get_recipient_info(cursor, recipient_id):
     try:
         query = """
-        SELECT recipient_ID, first_Name, last_Name, email, blood_type, city
+        SELECT recipient_ID, firstName, lastName, blood_type, rhesus, email, branch_ID
         FROM recipient
         WHERE recipient_ID = %s
         """
@@ -219,7 +258,7 @@ def get_recipient_info(cursor, recipient_id):
         print(f"Error: {err}")
 
 
-# get organization info - works
+# get organization info 
 def get_organization_info(cursor, branch_id):
     try:
         query = """
@@ -232,44 +271,122 @@ def get_organization_info(cursor, branch_id):
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
-# matching both donor and recipient for the hc_professional page 
+# matching both donor and recipient for the hc_professional page - waiting for front-end
 
-# get the info of the individual to the donor
-
-# add the apptdate 
-
-# isQualified implementation - depends on how we will use it!!!
-@app.route('/update_qualification', methods=['POST'])
-def update_qualification():
+# check if qualified through blood sample test
+@app.route('/add_blood_sample_test', methods=['POST'])
+def add_blood_sample_test():
     data = request.get_json()
     
-    donor_id = data.get('donor_id')
-    isQualified = data.get('isQualified')
-    
-    if donor_id is None or isQualified is None:
-        return jsonify({'message': 'Donor ID and qualification status are required'}), 400
-    
-    if isQualified not in [0, 1]:
-        return jsonify({'message': 'Qualification status must be 0 or 1'}), 400
-    
+    # Extract data 
+    appointment_Date = data.get('appointment_Date')
+    sobriety = data.get('sobriety')
+    last_donated_date = data.get('last_Donated_Date')  
+    disease = data.get('disease') 
+    bMI = data.get('bmi')
+    hemoglobin = data.get('hemoglobin')
+    iron_levels = data.get('iron_levels')
+    is_Qualified = data.get('isQualified')
+    donor_ID = data.get('donor_id') 
+    blood_ID = data.get('blood_id')  
+
+    # Validate required fields
+    if not all([appointment_Date, sobriety, bMI, hemoglobin, iron_levels, is_Qualified, donor_ID, blood_ID]):
+        return jsonify({'error': 'All required fields must be provided'}), 400
+
+    # Database inserting valus
     cur = mysql.connection.cursor()
     try:
-        # Update the isQualified field in the donor table
-        query = "UPDATE donor SET isQualified = %s WHERE donor_id = %s"
-        cur.execute(query, (isQualified, donor_id))
+        # Insert data into the Blood_Sample_Test table
+        cur.execute(
+            """
+            INSERT INTO Blood_Sample_Test (
+                appointment_Date, sobriety, last_Donated_Date, disease, bMI, 
+                hemoglobin, iron_levels, isQualified, donor_ID, blood_ID
+            ) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (appointment_Date, sobriety, last_donated_date, disease, bMI, hemoglobin, iron_levels, 
+                is_Qualified, donor_ID, blood_ID
+            )
+        )
         mysql.connection.commit()
-        
-        return jsonify({'message': f'Donor qualification status updated to {isQualified}'}), 200
+        return jsonify({'message': 'Blood sample test added successfully'}), 201
+    except pymysql.err.IntegrityError:
+        # Handle cases like invalid foreign keys or duplicate entries
+        return jsonify({'error': 'Invalid donor ID or blood ID'}), 400
     except Exception as e:
+        # Handle other database errors
         mysql.connection.rollback()
-        return jsonify({'message': f'Error: {str(e)}'}), 500
+        return jsonify({'error': f'Error: {str(e)}'}), 500
     finally:
         cur.close()
 
+# Fill the blood unit to be donated - only if isQualified
+@app.route('/add_blood_unit', methods=['POST'])
+def add_blood_unit():
+    data = request.get_json()
 
-def send_email(recipient_email, subject, body): #works
+    # Extract data from the request payload
+    donor_ID = data.get('donor_ID')
+    recipient_ID = data.get('recipient_ID')
+    branch_Name = data.get('branch_Name')  # Branch name provided by the frontend
+    blood_type = data.get('blood_type')  # ENUM values: 'A', 'B', 'AB', 'O'
+    rhesus = data.get('rhesus')  # ENUM values: '+', '-'
+
+    # Validate required fields
+    if not all([donor_ID, recipient_ID, branch_Name, blood_type, rhesus]):
+        return jsonify({'error': 'All required fields must be provided'}), 400
+
+    # Validate ENUM values for blood_type and rhesus
+    if blood_type not in ['A', 'B', 'AB', 'O'] or rhesus not in ['+', '-']:
+        return jsonify({'error': 'Invalid blood type or rhesus value'}), 400
+
+    cur = mysql.connection.cursor()
+    try:
+        # Step 1: Check if the donor is qualified
+        cur.execute("SELECT isQualified FROM Donor WHERE donor_ID = %s", (donor_id,))
+        result = cur.fetchone()
+
+        if not result:
+            return jsonify({'error': 'Donor not found'}), 404
+
+        is_qualified = result['isQualified']
+
+        if is_qualified != 'yes':
+            return jsonify({'error': 'Donor is not qualified to donate blood'}), 400
+
+        # Step 2: Fetch the branch_id based on branch_name
+        cur.execute("SELECT branch_ID FROM Branch WHERE branch_Name = %s", (branch_Name,))
+        branch_result = cur.fetchone()
+
+        if not branch_result:
+            return jsonify({'error': 'Invalid branch name'}), 400
+
+        branch_ID = branch_result['branch_ID']
+
+        # Step 3: Insert into blood_unit_tobedonated table
+        cur.execute(
+            """
+            INSERT INTO blood_unit_tobedonated (blood_type, rhesus, donor_ID, recipient_ID, branch_ID)
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (blood_type, rhesus, donor_ID, recipient_ID, branch_ID)
+        )
+        mysql.connection.commit()
+        return jsonify({'message': 'Blood unit added successfully'}), 201
+
+    except Exception as e:
+        # Rollback in case of error
+        mysql.connection.rollback()
+        return jsonify({'error': f'Error: {str(e)}'}), 500
+    finally:
+        cur.close()
+
+# when the user will click, an email will be sent - works 
+def send_email(recipient_email, subject, body): 
     sender_email = "sawablood@gmail.com"
-    sender_password = "SawaBlood@december19"
+    sender_password = "SawaBlood@december19" # not very safe to type it in code but too complicated to do it in another way
     
     # Set up the server
     server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -291,19 +408,18 @@ def send_email(recipient_email, subject, body): #works
     # Close the server connection
     server.quit()
 
-@app.route('/reserve', methods=['POST']) #idk
+@app.route('/reserve', methods=['POST']) # will fix it after checking front-end
 def reserve():
     # Check if the user is logged in
     if 'user_id' not in session:
         return jsonify({"error": "User not logged in"}), 401
 
     # Get reservation details from the POST request
-    branch_id = request.json.get('branch_id')
-    appointment_date = request.json.get('appointment_date')
-    hc_professional_id = request.json.get('hc_professional_id')
+    branch_ID = request.json.get('branch_ID')
+    appointment_Date = request.json.get('appointment_Date')
 
-    if not branch_id or not appointment_date or not hc_professional_id:
-        return jsonify({"error": "Branch ID, appointment date, and healthcare professional ID are required"}), 400
+    if not branch_id or not appointment_date :
+        return jsonify({"error": "Branch ID and appointment date are required"}), 400
 
     try:
         # Connect to the MySQL database
@@ -325,10 +441,10 @@ def reserve():
         # Create a reservation
         cursor.execute(
             """
-            INSERT INTO appointment (appointment_date, donor_id, branch_id, hc_professional_id) 
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO Blood_Sample_Test (appointment_Date, donor_ID) 
+            VALUES (%s, %s,)
             """,
-            (appointment_date, user_id, branch_id, hc_professional_id)
+            (appointment_date, user_id, branch_id)
         )
         conn.commit()
 
