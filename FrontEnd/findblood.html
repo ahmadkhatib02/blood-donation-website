@@ -25,7 +25,7 @@
         <img src="images/panel.png">
         <div class="recipient-form">
             <h1>Recipient Details</h1>
-            <form id="form" action="bloodbanks.html">
+            <form id="form">
                 <div>
                     <label for="firstName">Full Name</label>
                     <input type="text" id="firstName" placeholder="First" required><br>
@@ -34,16 +34,21 @@
 
                 <div>
                     <label> Blood Group</label>
-                    <select id="bloodGroup" class="blood-group" required>
-                        <option selected></option>
-                        <option value="A+">A+</option>
-                        <option value="A-">A-</option>
-                        <option value="AB+">AB+</option>
-                        <option value="AB-">AB-</option>
-                        <option value="B+">B+</option>
-                        <option value="B-">B-</option>
-                        <option value="O+">O+</option>
-                        <option value="O-">O-</option>
+                    <select id="bloodGroup" required>
+                        <option value="" disabled selected>Select Blood Group</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="AB">AB</option>
+                        <option value="O">O</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="rhesus">Rhesus Factor:</label>
+                    <select id="rhesus" required>
+                        <option value="" disabled selected>Select Rhesus</option>
+                        <option value="+">+</option>
+                        <option value="-">-</option>
                     </select>
                 </div>
  

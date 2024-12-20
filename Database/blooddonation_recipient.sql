@@ -29,7 +29,7 @@ CREATE TABLE `recipient` (
   `blood_type` enum('A','B','AB','O') NOT NULL,
   `rhesus` enum('+','-') NOT NULL,
   `email` varchar(255) NOT NULL,
-  `branch_ID` int NOT NULL,
+  `branch_ID` int,
   PRIMARY KEY (`recipient_ID`),
   KEY `branch_ID` (`branch_ID`),
   CONSTRAINT `recipient_ibfk_1` FOREIGN KEY (`branch_ID`) REFERENCES `branch` (`branch_ID`) ON DELETE CASCADE

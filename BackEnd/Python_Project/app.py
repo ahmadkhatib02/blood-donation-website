@@ -14,7 +14,7 @@ CORS(app)  # Enable Cross-Origin Resource Sharing (optional for frontend-backend
 # Configuring MySQL database
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'  # Change to your MySQL username
-app.config['MYSQL_PASSWORD'] = 'ahmadkhatib18!'  # Change to your MySQL password
+app.config['MYSQL_PASSWORD'] = 'ahmadkhatib18'  # Change to your MySQL password
 app.config['MYSQL_DB'] = 'blooddonation'
 
 mysql = MySQL(app)
@@ -151,34 +151,31 @@ def add_recipient():
     data = request.get_json()
     firstName = data.get('firstName')
     lastName = data.get('lastName')
-    blood_type = data.get('blood-type')
+    blood_type = data.get('bloodGroup')
     rhesus = data.get('rhesus')
     email = data.get('email')
-    branch_Name = data.get('branch_Name') # I am using branch name so I can fill the FK donor_id
 
-    if not all([firstName, lastName, blood_type, rhesus, email, branch_Name]):
+     # Debugging for missing fields
+    print("First Name:", firstName)
+    print("Last Name:", lastName)
+    print("Blood Type:", blood_type)
+    print("Rhesus:", rhesus)
+    print("Email:", email)
+
+    if not all([firstName, lastName, blood_type, rhesus, email]):
         return jsonify({'message': 'All fields are required'}), 400
 
     cur = mysql.connection.cursor()
     try:
-        # Fetch the branch_ID based on branch_name so we can fill it 
-        cur.execute("SELECT branch_ID FROM branch WHERE branch_name = %s", (branch_Name,))
-        branch_ID = cur.fetchone()
-
-        if not branch_ID:
-            # If branch_name does not exist in the branch table - won't happen but better be safe than sorry
-            return jsonify({'message': 'Invalid branch name'}), 400
-
-        branch_ID = branch_ID['branch_ID']  # Extract the branch_ID from the result
-
         # Insert recipient data into the recipient table
         cur.execute(
-            "INSERT INTO recipient (firstName, lastName, blood_type, rhesus, email, branch_ID) "
-            "VALUES (%s, %s, %s, %s, %s, %s)",
-            (firstName, lastName, blood_type, rhesus, email, branch_ID)
+            "INSERT INTO recipient (firstName, lastName, blood_type, rhesus, email) "
+            "VALUES (%s, %s, %s, %s, %s)",
+            (firstName, lastName, blood_type, rhesus, email)
         )
+        recipient_id = cur.lastrowid
         mysql.connection.commit()
-        return jsonify({'message': 'Recipient added successfully'}), 201
+        return jsonify({'message': 'Recipient added successfully', "recipient_id": recipient_id}), 201
 
     except Exception as e:
         # Rollback in case of error
@@ -501,3 +498,30 @@ def locations():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+ #Update the branch Id in the recipient when reservation
+@app.route('/update_recipient', methods=['POST'])
+def update_recipient():
+    try:
+        # Get JSON data from the request
+        data = request.get_json()
+        branch_ID = data.get('branch_ID')  # Retrieve branch ID
+        recipient_ID = data.get('recipient_ID')
+        print(branch_ID)
+
+        # Update the recipient table in the database
+        cur = mysql.connection.cursor()
+        cur.execute(
+            "UPDATE recipient SET branch_ID = %s WHERE recipient_ID = %s",  
+            (branch_ID, recipient_ID)  # Replace with the correct condition
+        )
+        mysql.connection.commit()
+
+        return jsonify({"message": "Recipient updated successfully!"}), 200
+    except Exception as e:
+        print("Error updating recipient:", str(e))
+        return jsonify({"message": f"Error: {str(e)}"}), 500
+    finally:
+        if 'cur' in locals():
+            cur.close()

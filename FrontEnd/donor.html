@@ -96,13 +96,12 @@
                 </div>
                 
                 <div>
-                    <p>Rhesus:</p>
-                    <input type="radio" id="+" name="rhesus" value ="+"checked>
-                    <label for="+">Positive</label>
-                    </label>
-                    <br>
-                    <input type="radio" id="-" name="rhesus" value ="-" >
-                    <label for="-">Negative</label>
+                    <label for="rhesus">Rhesus Factor:</label>
+                    <select id="rhesus" required>
+                        <option value="" disabled selected>Select Rhesus</option>
+                        <option value="+">+</option>
+                        <option value="-">-</option>
+                    </select>
                 </div>
                 
                 <button type="submit" id="submit-btn">

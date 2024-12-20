@@ -8,6 +8,15 @@ const main = document.getElementById("main")
 let booking = new Object();
 let allLocations = {}
 
+
+//fetching the id 
+function getRecipientIDFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get("recipient_id");
+}
+
+const recipientID = getRecipientIDFromURL();
+
 //fetching all the data
 async function fetchLocations() {
     
@@ -98,38 +107,34 @@ function displayElements(element){
 
     for(let i=0; i<contact.length; i++){
         let message= `Thank you for contacting ${element[i].branch_name}!
-                      The organization will contact you soon.`
+                      You can visit the organization whenever you want.`
         
-        contact[i].addEventListener("click",function(){
+        contact[i].addEventListener("click", async function(){
             window.alert(message) 
-            window.location.href ="homePage.html"
-        })
-    }
-}
 
- async function book (booking, name, adress){
-    booking["name"]= name
-    booking["adress"]= adress
-    try {
-        // Send the booking data to the backend
-        const response = await fetch("http://127.0.0.1:5000/donors", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(booking), // Convert booking object to JSON
-        });
-
-        if (response.ok) {
-            const responseData = await response.json();
-            console.log("Order stored successfully:", responseData);
-
-            // Optionally navigate to another page
-            window.location.href = "profile-recipient.html";
-        } else {
-            console.error("Failed to store order:", response.statusText);
-        }
-    } catch (error) {
-        console.error("Error in booking process:", error);
+            try{
+                const branchID = element[i].id
+                const response = await fetch("http://127.0.0.1:5000/update_recipient", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ branch_ID: branchID, recipient_ID: recipientID }) 
+                })
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("Recipient updated successfully:", data);
+                    window.location.href = "homePage.html";
+                } else {
+                    console.error("Failed to update recipient:", response.statusText);
+                    window.alert("Failed to update recipient. Please try again.");
+                }
+            } 
+            catch (error) {
+                console.error("Error in updating recipient:", error);
+                window.alert("An error occurred while contacting the organization.");
+            }
+            }
+        )
     }
 }

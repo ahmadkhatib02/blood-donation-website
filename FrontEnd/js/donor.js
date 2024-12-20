@@ -29,11 +29,22 @@ form.addEventListener("submit", async (event) => {
     const password = document.getElementById("password").value;
     const gender = document.getElementById("gender").value;
     const city = document.getElementById("cities").value;
-    // Validate form data
-    if (!firstName || !lastName || !email || !password) {
-        alert("Please fill in all the fields.");
-        return;
-    }
+    const phoneNumber = document.getElementById("phoneNb").value;
+    const blood_type = document.getElementById("blood-type").value;
+    const rhesus = document.getElementById("rhesus").value;
+
+    console.log("Collected form data:", {
+        firstName,
+        lastName,
+        email,
+        password,
+        gender,
+        city,
+        phoneNumber,
+        blood_type,
+        rhesus
+    });
+    
 
     try {
         // Send a POST request to the backend /register endpoint
@@ -43,17 +54,22 @@ form.addEventListener("submit", async (event) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
+                email,
                 firstName,
                 lastName,
-                email,
-                password,
                 gender,
-                city
+                phoneNumber,
+                city,
+                password,
+                blood_type, 
+                rhesus 
             })
         });
 
-        const data = await response.json();
 
+        console.log("Response received:", response);
+        const data = await response.json();
+        console.log("Parsed response data:", data);
         if (response.ok) {
             alert(data.message); // Show success message
             // Redirect to the login page or another page

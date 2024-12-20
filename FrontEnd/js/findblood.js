@@ -21,12 +21,8 @@ form.addEventListener("submit", async (event) => {
     const lastName = document.getElementById("lastName").value.trim();
     const email = document.getElementById("email").value.trim();
     const bloodGroup = document.getElementById("bloodGroup").value;
-    
-    // Validate form data 
-    if (!firstName || !lastName || !email || !bloodGroup) {
-        alert("Please fill in all the fields.");
-        return;
-    }
+    const rhesus = document.getElementById("rhesus").value;
+
 
     try {
         // Send a POST request to the backend /register endpoint
@@ -36,17 +32,27 @@ form.addEventListener("submit", async (event) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                email,
-                blood_type: bloodGroup,
                 firstName,
                 lastName,
-
+                bloodGroup,
+                rhesus,
+                email,
             })
         });
 
         const data = await response.json();
+        console.log("Backend Response:", data);
 
         if (response.ok) {
+            console.log("testing")
+            const recipientID = data.recipient_ID; // Fetch the recipient ID from the backend
+            console.log("Recipient ID:", recipientID);
+
+            // Store it in localStorage
+            localStorage.setItem("recipient_id", recipientID);
+            console.log("Recipient ID stored in localStorage:", recipientID);
+            alert("Registration successful!");
+            window.location.href = "bloodbank.html"; // Redirect to bloodbank.html
             alert(data.message); // Show success message
             // Redirect to the login page or another page
             window.location.href = "bloodbanks.html";
