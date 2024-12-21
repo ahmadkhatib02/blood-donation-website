@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/footerLogo.png">
+    <link rel="stylesheet" href="styles/donor-login.css">
+    <title>Status Form</title>
+</head>
+<body>
+    <nav>
+        <div class="navdiv">
+            <div class="logo"> <a href="homePage.html"><img src="images/logo.png"></a></li></div>
+            <ul>
+                <li> <a href="homePage.html" class="header">Home</a></li>
+                <li><a href="findblood.html" class="header">Find Blood</a></li>
+                <li><a href="donor.html" class="header">Register Now</a></li>
+                <li><a href="homePage.html" class="login-button">Log Out</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section>
+            <h1>Status Form</h1>
+            <form action="organizationPanel.html">
+                <div>
+                    <label for="firstDate">Appointement Date: </label>
+                    <input type="date" id="firstDate" placeholder="01/01/2024" required>
+                </div>
+
+                <div>
+                    <label for="sobriety">Sobriety: </label>
+                    <select id="sobriety" required>
+                        <option value="" disabled selected>Select Sobriety</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>  
+                </div>
+
+                <div>
+                    <label for="lastDate">Last Donation: </label>
+                    <input type="date" id="lastDate" placeholder="01/01/2024" required>
+                </div>
+
+                <div>
+                    <label for="disease">Disease: </label>
+                    <input type="text" id="disease" placeholder="Aids, Cancer....." required>
+                </div>
+
+                <div>
+                    <label for="hemoglobin">Hemoglobin Levels: </label>
+                    <input type="number" id="hemoglobin"  pattern="[0-9]*[.,]?[0-9]*" placeholder="13.2" required>
+                </div>
+
+                <div>
+                    <label for="iron">Iron Levels: </label>
+                    <input type="number" id="iron"  pattern="[0-9]*[.,]?[0-9]*" placeholder="11.00" required>
+                </div>
+
+                <div>
+                    <label for="qualified">Qualification: </label>
+                    <select id="qualified" required>
+                        <option value="" disabled selected>Qualification Status</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>  
+                </div>
+
+                <button type="submit" id="submit-btn">
+                    <span id="submit">Submit</span>
+                    <span class="img" id="img"><img src="images/check-circle.png"></span>
+                   
+                </button>
+            </form>
+        </section>
+    </main>
+    <script src="js/form.js"></script>
+</body>
+</html>

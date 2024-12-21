@@ -6,6 +6,7 @@ from functools import wraps
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import pymysql
 
 
 app = Flask(__name__)
@@ -274,21 +275,26 @@ def get_organization_info(cursor, branch_id):
 @app.route('/add_blood_sample_test', methods=['POST'])
 def add_blood_sample_test():
     data = request.get_json()
+    print("Received Data:", data)
     
     # Extract data 
     appointment_Date = data.get('appointment_Date')
     sobriety = data.get('sobriety')
     last_donated_date = data.get('last_Donated_Date')  
     disease = data.get('disease') 
-    bMI = data.get('bmi')
     hemoglobin = data.get('hemoglobin')
     iron_levels = data.get('iron_levels')
-    is_Qualified = data.get('isQualified')
-    donor_ID = data.get('donor_id') 
-    blood_ID = data.get('blood_id')  
+    isQualified = data.get('isQualified') 
+
+    print("Extracted Values:")
+    print("appointment_Date:", appointment_Date)
+    print("sobriety:", sobriety)
+    print("hemoglobin:", hemoglobin)
+    print("iron_levels:", iron_levels)
+    print("is_Qualified:", isQualified)
 
     # Validate required fields
-    if not all([appointment_Date, sobriety, bMI, hemoglobin, iron_levels, is_Qualified, donor_ID, blood_ID]):
+    if not all([appointment_Date, sobriety, hemoglobin, iron_levels, isQualified]):
         return jsonify({'error': 'All required fields must be provided'}), 400
 
     # Database inserting valus
@@ -298,13 +304,13 @@ def add_blood_sample_test():
         cur.execute(
             """
             INSERT INTO Blood_Sample_Test (
-                appointment_Date, sobriety, last_Donated_Date, disease, bMI, 
-                hemoglobin, iron_levels, isQualified, donor_ID, blood_ID
+                appointment_Date, sobriety, last_Donated_Date, disease, 
+                hemoglobin, iron_levels, isQualified
             ) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             """,
-            (appointment_Date, sobriety, last_donated_date, disease, bMI, hemoglobin, iron_levels, 
-                is_Qualified, donor_ID, blood_ID
+            (appointment_Date, sobriety, last_donated_date, disease, hemoglobin, iron_levels, 
+                isQualified
             )
         )
         mysql.connection.commit()

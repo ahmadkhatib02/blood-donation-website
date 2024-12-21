@@ -5,9 +5,6 @@ const contact = document.getElementsByClassName("Contact")
 const name = document.getElementsByClassName("name")
 const adress = document.getElementsByClassName("adress")
 const main = document.getElementById("main")
-let booking = new Object();
-let allLocations = {}
-
 
 //fetching the id 
 function getRecipientIDFromURL() {
