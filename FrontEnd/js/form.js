@@ -24,6 +24,7 @@ form.addEventListener("submit", async (event) => {
     const hemoglobin = document.getElementById("hemoglobin").value;
     const iron_levels = document.getElementById("iron").value;
     const isQualified = document.getElementById("qualified").value;
+    const donor_ID = document.getElementById("donorID").value;
 
     try {
         // Send POST request to the backend
@@ -39,17 +40,19 @@ form.addEventListener("submit", async (event) => {
                 disease,
                 hemoglobin,
                 iron_levels,
-                isQualified
+                isQualified,
+                donor_ID
             }),
         });
 
         const data = await response.json();
 
         if (response.ok) {
-            
-            alert('Form Submitted');
-            
-            window.location.href = 'organizationPanel.html';
+            const message = `Submission Of Form is Completed Successfully
+            You can start filling another form`
+            window.alert(message)
+            window.location.href = "form.html"
+    
         } else {
             
             alert(data.message || 'Form Failed. Please try again.');

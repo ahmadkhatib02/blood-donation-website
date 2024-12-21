@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_mysqldb import MySQL
 from flask_cors import CORS
 import bcrypt
@@ -72,8 +72,9 @@ def health_Care_Professional_login():
         return jsonify({'message': 'Email and password are required'}), 400
 
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM Health_Care_Professional WHERE email=%s", (email,))
+    cur.execute("SELECT hc_professional_ID, password FROM Health_Care_Professional WHERE email=%s", (email,))
     health_Care_Professional = cur.fetchone()
+    cur.close()
 
     if not health_Care_Professional:
         return jsonify({'message': 'Healthcare professional not found'}), 404
@@ -124,6 +125,8 @@ def register():
             "VALUES (%s, %s, %s, %s, %s, %s, %s)",
             (email, firstName, lastName, gender, phoneNumber, city, hashed_pw.decode('utf-8'))
         )
+        mysql.connection.commit()
+        print(f"Email inserted into individual table: {email}")
         cur.execute(
             "INSERT INTO donor (blood_type, rhesus, email) "
             "VALUES (%s, %s, %s)",
@@ -285,6 +288,7 @@ def add_blood_sample_test():
     hemoglobin = data.get('hemoglobin')
     iron_levels = data.get('iron_levels')
     isQualified = data.get('isQualified') 
+    donor_ID = data.get('donor_ID')
 
     print("Extracted Values:")
     print("appointment_Date:", appointment_Date)
@@ -294,7 +298,7 @@ def add_blood_sample_test():
     print("is_Qualified:", isQualified)
 
     # Validate required fields
-    if not all([appointment_Date, sobriety, hemoglobin, iron_levels, isQualified]):
+    if not all([appointment_Date, sobriety, hemoglobin, iron_levels, isQualified, donor_ID]):
         return jsonify({'error': 'All required fields must be provided'}), 400
 
     # Database inserting valus
@@ -305,12 +309,12 @@ def add_blood_sample_test():
             """
             INSERT INTO Blood_Sample_Test (
                 appointment_Date, sobriety, last_Donated_Date, disease, 
-                hemoglobin, iron_levels, isQualified
+                hemoglobin, iron_levels, isQualified, donor_ID
             ) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """,
             (appointment_Date, sobriety, last_donated_date, disease, hemoglobin, iron_levels, 
-                isQualified
+                isQualified, donor_ID
             )
         )
         mysql.connection.commit()
@@ -531,3 +535,103 @@ def update_recipient():
     finally:
         if 'cur' in locals():
             cur.close()
+
+@app.route('/get_donor_id', methods=['POST'])
+def get_donor_id():
+    data = request.get_json()
+
+    # Extract email from the request
+    email = data.get('email')
+
+    # Check if email is provided
+    if not email:
+        return jsonify({'error': {'code': 400, 'message': 'Email is required'}}), 400
+
+    # Query to get the donor_ID based on the provided email
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("SELECT donor_ID FROM donor WHERE email = %s", (email,))
+        result = cur.fetchone()
+    finally:
+        cur.close()  # Ensure cursor is closed after execution
+
+    # If no donor found with this email
+    if not result:
+        return jsonify({'error': {'code': 404, 'message': 'Donor not found'}}), 404
+
+    # If donor found, return the donor_ID
+    donor_ID = result[0]  # The first field (index 0) is the donor_ID in the db
+    return jsonify({'donor_ID': donor_ID}), 200
+
+
+def process_qualified_donors(cursor):
+    try:
+        # Step 1: Find all qualified blood samples
+        cursor.execute('''
+        SELECT donor_ID
+        FROM blood_sample_test
+        WHERE isQualified = 'yes'
+        ''')
+        qualified_donors = cursor.fetchall()
+
+        if not qualified_donors:
+            print("No qualified donors found.")
+            return  # Exit if no donors
+
+        # Step 2: Process each qualified donor
+        for donor in qualified_donors:
+            donor_ID = donor[0]
+
+            # Get donor blood type and rhesus
+            cursor.execute('''
+            SELECT blood_type, rhesus
+            FROM donor
+            WHERE donor_ID = %s
+            ''', (donor_ID,))
+            donor_data = cursor.fetchone()
+
+            if donor_data:
+                blood_type, rhesus = donor_data
+
+                # Step 3: Insert data into 'blood_unit_tobedonated' table
+                cursor.execute('''
+                INSERT INTO blood_unit_tobedonated (blood_type, rhesus, donor_ID, recipient_ID, branch_ID)
+                VALUES (%s, %s, %s, NULL, NULL)
+                ''', (blood_type, rhesus, donor_ID))
+
+        print("Qualified donors' data has been successfully processed.")
+
+    except Exception as e:
+        print(f"Error in process_qualified_donors: {e}")
+        raise  # Reraise the exception for the caller to handle
+
+
+# Main script
+try:
+    # Connect to the database
+    conn = mysql.connector.connect(
+        host="localhost",  # Replace with your DB host
+        user="root",  # Replace with your DB username
+        password="ahmadkhatib18",  # Replace with your DB password
+        database="blooddonation"  # Replace with your DB name
+    )
+    cursor = conn.cursor()
+
+    # Call the function
+    process_qualified_donors(cursor)
+
+    # Commit the transaction
+    conn.commit()
+    print("Transaction committed successfully.")
+
+except mysql.connector.Error as e:
+    print(f"Database connection error: {e}")
+    if conn:
+        conn.rollback()  # Rollback if there's an error
+
+finally:
+    # Close the database connection
+    if cursor:
+        cursor.close()
+    if conn:
+        conn.close()

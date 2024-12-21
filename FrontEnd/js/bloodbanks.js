@@ -9,14 +9,6 @@ let booking = new Object();
 let allLocations = {}
 
 
-//fetching the id 
-function getRecipientIDFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get("recipient_id");
-}
-
-const recipientID = getRecipientIDFromURL();
-
 //fetching all the data
 async function fetchLocations() {
     
@@ -111,29 +103,7 @@ function displayElements(element){
         
         contact[i].addEventListener("click", async function(){
             window.alert(message) 
-
-            try{
-                const branchID = element[i].id
-                const response = await fetch("http://127.0.0.1:5000/update_recipient", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ branch_ID: branchID, recipient_ID: recipientID }) 
-                })
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log("Recipient updated successfully:", data);
-                    window.location.href = "homePage.html";
-                } else {
-                    console.error("Failed to update recipient:", response.statusText);
-                    window.alert("Failed to update recipient. Please try again.");
-                }
-            } 
-            catch (error) {
-                console.error("Error in updating recipient:", error);
-                window.alert("An error occurred while contacting the organization.");
-            }
+            window.location.href = "homePage.html";
             }
         )
     }

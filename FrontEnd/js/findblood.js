@@ -22,7 +22,7 @@ form.addEventListener("submit", async (event) => {
     const email = document.getElementById("email").value.trim();
     const bloodGroup = document.getElementById("bloodGroup").value;
     const rhesus = document.getElementById("rhesus").value;
-
+    
 
     try {
         // Send a POST request to the backend /register endpoint
