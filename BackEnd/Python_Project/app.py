@@ -7,6 +7,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import pymysql
+import mysql.connector
 
 
 app = Flask(__name__)
@@ -596,7 +597,7 @@ def process_qualified_donors(cursor):
                 # Step 3: Insert data into 'blood_unit_tobedonated' table
                 cursor.execute('''
                 INSERT INTO blood_unit_tobedonated (blood_type, rhesus, donor_ID, recipient_ID, branch_ID)
-                VALUES (%s, %s, %s, NULL, NULL)
+                VALUES (%s, %s, %s, 7, 1)
                 ''', (blood_type, rhesus, donor_ID))
 
         print("Qualified donors' data has been successfully processed.")
